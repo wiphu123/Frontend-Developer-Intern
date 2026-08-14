@@ -60,10 +60,7 @@ const translations = {
   }
 };
 
-export default function KolRegisterPage({
-  onNext,
-  onNavigateToLogin,
-}: KolRegisterPageProps) {
+export default function KolRegisterPage({ onNext, onNavigateToLogin }: KolRegisterPageProps) {
   const [lang, setLang] = useState<'th' | 'en'>('th');
 
   const [formData, setFormData] = useState({

@@ -1,5 +1,5 @@
 import React from 'react';
-import myImage from './assets/myimge.jpg';
+import image from './assets/image.jpg';
 
 interface HeroSectionProps {
   heroTag: string;
@@ -48,7 +48,7 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
           <div className="relative w-full h-[270px] sm:h-[290px] bg-white rounded-[26px] p-2 shadow-xl shadow-indigo-100/50 border border-slate-100/80">
             <div className="w-full h-full rounded-[20px] overflow-hidden">
               <img 
-                src={myImage} 
+                src={image} 
                 alt="Live Creator" 
                 className="w-full h-full object-cover" 
               />

@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
-
-interface LoginPageProps {
-  onNavigateToStaffRegister: () => void;
-  onNavigateToKolRegister: () => void;
-}
 
 const translations = {
   th: {
@@ -56,7 +52,8 @@ const translations = {
   }
 };
 
-export default function LoginPage({ onNavigateToStaffRegister, onNavigateToKolRegister }: LoginPageProps) {
+export default function LoginPage() {
+  const navigate = useNavigate();
   const [lang, setLang] = useState<'th' | 'en'>('th');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -179,7 +176,7 @@ export default function LoginPage({ onNavigateToStaffRegister, onNavigateToKolRe
                 {t.isStaff}{' '}
                 <button
                   type="button"
-                  onClick={onNavigateToStaffRegister}
+                  onClick={() => navigate('/register')}
                   className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
                 >
                   {t.staffRegister}
@@ -189,7 +186,7 @@ export default function LoginPage({ onNavigateToStaffRegister, onNavigateToKolRe
                 {t.isKol}{' '}
                 <button
                   type="button"
-                  onClick={onNavigateToKolRegister}
+                  onClick={() => navigate('/register-kol')}
                   className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
                 >
                   {t.kolRegister}

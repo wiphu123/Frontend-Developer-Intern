@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import { User, Mail, Briefcase, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Mail, Briefcase, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
-
-interface RegisterPageProps {
-  onNavigateToLogin: () => void;
-}
 
 const translations = {
   th: {
@@ -87,7 +84,8 @@ const translations = {
   }
 };
 
-export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
+export default function RegisterPage() {
+  const navigate = useNavigate();
   const [lang, setLang] = useState<'th' | 'en'>('th');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -100,13 +98,74 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [validations, setValidations] = useState<Record<string, boolean>>({});
 
   const t = translations[lang];
+
+  // Real-time validation function
+  const validateField = (name: string, value: string) => {
+    let isValid = false;
+    let errorMsg = '';
+
+    switch (name) {
+      case 'firstName':
+        isValid = value.trim().length > 0;
+        if (!isValid) errorMsg = t.reqFirstName;
+        break;
+      case 'lastName':
+        isValid = value.trim().length > 0;
+        if (!isValid) errorMsg = t.reqLastName;
+        break;
+      case 'email':
+        isValid = /\S+@\S+\.\S+/.test(value);
+        if (!value) errorMsg = t.reqEmail;
+        else if (!isValid) errorMsg = t.invalidEmail;
+        break;
+      case 'position':
+        isValid = value.length > 0;
+        if (!isValid) errorMsg = t.reqPosition;
+        break;
+      case 'password':
+        isValid = value.length >= 8;
+        if (!value) errorMsg = t.reqPassword;
+        else if (!isValid) errorMsg = t.minPassword;
+        break;
+      case 'confirmPassword':
+        isValid = value === formData.password && value.length > 0;
+        if (!value) errorMsg = t.reqPassword;
+        else if (!isValid) errorMsg = t.matchPassword;
+        break;
+      default:
+        break;
+    }
+
+    setValidations((prev) => ({ ...prev, [name]: isValid }));
+    if (!isValid && value.trim()) {
+      setErrors((prev) => ({ ...prev, [name]: errorMsg }));
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+    
+    // Real-time validation after field is touched
+    if (touched[name]) {
+      validateField(name, value);
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name, value);
   };
 
   const validate = () => {
@@ -136,6 +195,21 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
     if (validate()) {
       alert(lang === 'th' ? 'ส่งการลงทะเบียนเรียบร้อยแล้ว!' : 'Registration submitted successfully!');
     }
+  };
+
+  // Helper function to get field status
+  const getFieldStatus = (fieldName: string) => {
+    if (!touched[fieldName]) return 'neutral';
+    return validations[fieldName] ? 'valid' : 'invalid';
+  };
+
+  // Helper function for input border color
+  const getBorderClass = (fieldName: string) => {
+    const status = getFieldStatus(fieldName);
+    // แสดงสีแดงเฉพาะตอนที่ผิด
+    if (status === 'invalid') return 'border-rose-500 focus:ring-rose-200';
+    // สีปกติทั้งตอนที่ถูกและตอนไม่แตะ
+    return 'border-slate-200 focus:ring-indigo-200';
   };
 
   return (
@@ -195,7 +269,8 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
                       placeholder={t.firstNamePlaceholder}
                       value={formData.firstName}
                       onChange={handleChange}
-                      className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${errors.firstName ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                      onBlur={handleBlur}
+                      className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('firstName')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
                     />
                   </div>
                   {errors.firstName && <p className="text-[11px] text-rose-500 mt-0.5">{errors.firstName}</p>}
@@ -211,7 +286,8 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
                       placeholder={t.lastNamePlaceholder}
                       value={formData.lastName}
                       onChange={handleChange}
-                      className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${errors.lastName ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                      onBlur={handleBlur}
+                      className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('lastName')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
                     />
                   </div>
                   {errors.lastName && <p className="text-[11px] text-rose-500 mt-0.5">{errors.lastName}</p>}
@@ -229,7 +305,8 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
                     placeholder={t.emailPlaceholder}
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${errors.email ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                    onBlur={handleBlur}
+                    className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('email')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
                   />
                 </div>
                 {errors.email && <p className="text-[11px] text-rose-500 mt-0.5">{errors.email}</p>}
@@ -244,7 +321,8 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
                     name="position"
                     value={formData.position}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-8 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${errors.position ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition ${formData.position ? 'text-slate-800' : 'text-slate-300'} appearance-none cursor-pointer`}
+                    onBlur={handleBlur}
+                    className={`w-full pl-10 pr-8 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('position')} focus:outline-none focus:ring-2 transition ${formData.position ? 'text-slate-800' : 'text-slate-300'} appearance-none cursor-pointer`}
                   >
                     <option value="" disabled hidden>{t.positionPlaceholder}</option>
                     <option value="marketing" className="text-slate-800">{t.posMarketing}</option>
@@ -268,12 +346,13 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
                     placeholder={t.passwordPlaceholder}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${errors.password ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                    onBlur={handleBlur}
+                    className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('password')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 flex items-center justify-center"
+                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -293,12 +372,13 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
                     placeholder={t.confirmPasswordPlaceholder}
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${errors.confirmPassword ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                    onBlur={handleBlur}
+                    className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('confirmPassword')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 flex items-center justify-center"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -327,7 +407,7 @@ export default function RegisterPage({ onNavigateToLogin }: RegisterPageProps) {
               <span>{t.hasAccount} </span>
               <button
                 type="button"
-                onClick={onNavigateToLogin}
+                onClick={() => navigate('/login')}
                 className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
               >
                 {t.loginLink}
