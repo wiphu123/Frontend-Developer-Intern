@@ -106,7 +106,7 @@ export default function KolRegisterPage({
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
       
-      {/* ฝั่งซ้าย}
+      {/* ฝั่งซ้าย */}
       <HeroSection 
         heroTag={t.heroTag} 
         heroSubtitle={t.heroSubtitle} 
