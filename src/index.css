@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* เพิ่ม Animation  */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* เพิ่มความเหลื่อมเวลา ใ */
+.delay-1 { animation-delay: 0.5s; }
+.delay-2 { animation-delay: 1s; }
+.delay-3 { animation-delay: 0.5s; }
