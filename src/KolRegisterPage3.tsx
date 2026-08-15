@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowRight, Users, Trash2 } from 'lucide-react';
 import HeroSection from './HeroSection';
+import { useLanguage } from './contexts/LanguageContext';
 
 interface KolRegisterPage3Props {
+  initialData?: {
+    selectedPlatforms?: string[];
+    platformsData?: Record<string, PlatformData>;
+  };
   onBack: () => void;
   onSkip: () => void;
   onNext: (selectedPlatforms: string[], platformsData: Record<string, PlatformData>) => void;
@@ -16,63 +21,6 @@ interface PlatformData {
   ratePhoto: string;
   rateLive: string;
 }
-
-const translations = {
-  th: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'ลงทะเบียน KOL',
-    stepInfo: 'ขั้นตอนที่ 3 จาก 6 · ช่องทาง',
-    optionalNotice: 'ไม่บังคับ — คุณสามารถเพิ่มข้อมูลนี้ในโปรไฟล์ได้ภายหลัง',
-    platformLabel: 'เพิ่มแพลตฟอร์ม',
-    platformHint: 'เพิ่มแต่ละช่องทางที่คุณโพสต์ แล้วกรอกการเข้าถึงและค่าตอบแทน',
-    noPlatformText: 'ยังไม่มีแพลตฟอร์ม — เลือกด้านบนเพื่อเริ่มต้น',
-    profileUrlLabel: 'URL โปรไฟล์ / ชื่อผู้ใช้',
-    profileUrlPlaceholder: 'URL หรือชื่อผู้ใช้',
-    followersLabel: 'ผู้ติดตาม',
-    rateCardTitle: 'ตารางค่าตอบแทน',
-    rateCardSubtitle: 'ต่อชิ้นงาน - ไม่บังคับ',
-    rateVideo: 'วิดีโอ',
-    ratePhoto: 'ภาพ',
-    rateLive: 'ไลฟ์',
-    backBtn: 'ย้อนกลับ',
-    skipBtn: 'ข้าม',
-    submitBtn: 'ดำเนินการต่อ',
-    hasAccount: 'มีบัญชีอยู่แล้ว?',
-    loginLink: 'เข้าสู่ระบบ',
-    privacy: 'ความเป็นส่วนตัว',
-    terms: 'ข้อกำหนด',
-    help: 'ศูนย์ช่วยเหลือ',
-  },
-  en: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'KOL Registration',
-    stepInfo: 'Step 3 of 6 · Platforms & Channels',
-    optionalNotice: 'Optional — You can add this info to your profile later',
-    platformLabel: 'Add Platforms',
-    platformHint: 'Add each channel you post on, then enter reach and rates',
-    noPlatformText: 'No platforms added — select above to get started',
-    profileUrlLabel: 'Profile URL / Username',
-    profileUrlPlaceholder: 'URL or username',
-    followersLabel: 'Followers',
-    rateCardTitle: 'Rate Card',
-    rateCardSubtitle: 'Per post - Optional',
-    rateVideo: 'Video',
-    ratePhoto: 'Photo',
-    rateLive: 'Live',
-    backBtn: 'Back',
-    skipBtn: 'Skip',
-    submitBtn: 'Continue',
-    hasAccount: 'Already have an account?',
-    loginLink: 'Log In',
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Service',
-    help: 'Help Center',
-  }
-};
 
 const PLATFORMS = [
   {
@@ -137,30 +85,27 @@ const PLATFORMS = [
 ];
 
 export default function KolRegisterPage3({
+  initialData,
   onBack,
   onSkip,
   onNext,
   onNavigateToLogin,
 }: KolRegisterPage3Props) {
-  const [lang, setLang] = useState<'th' | 'en'>('th');
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const { t } = useLanguage();
   
-  //  เก็บข้อมูลแยกอิสระในแต่ละแพลตฟอร์ม
-  const [platformsData, setPlatformsData] = useState<Record<string, PlatformData>>({});
+  // นำค่า initialData มาใส่เป็นค่าเริ่มต้น (ถ้ามี)
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(initialData?.selectedPlatforms || []);
+  const [platformsData, setPlatformsData] = useState<Record<string, PlatformData>>(initialData?.platformsData || {});
 
-  const t = translations[lang];
-
-  //  สลับเปิด/ปิด แพลตฟอร์ม
+  // สลับเปิด/ปิด แพลตฟอร์ม
   const togglePlatform = (id: string) => {
     setSelectedPlatforms((prev) => {
       if (prev.includes(id)) {
-        // ลบข้อมูลออกเมื่อกดยกเลิก
         const newData = { ...platformsData };
         delete newData[id];
         setPlatformsData(newData);
         return prev.filter((p) => p !== id);
       } else {
-        // สร้างข้อมูลว่างๆ รอไว้เมื่อกดเลือก
         setPlatformsData((d) => ({
           ...d,
           [id]: { url: '', followers: '', rateVideo: '', ratePhoto: '', rateLive: '' }
@@ -170,7 +115,6 @@ export default function KolRegisterPage3({
     });
   };
 
-  //  อัปเดตข้อมูลที่พิมพ์ในช่อง Input ของแพลตฟอร์มนั้นๆ
   const handleDataChange = (platformId: string, field: keyof PlatformData, value: string) => {
     setPlatformsData((prev) => ({
       ...prev,
@@ -184,7 +128,7 @@ export default function KolRegisterPage3({
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
     if (onNext) {
-      onNext(selectedPlatforms, platformsData); // ส่งข้อมูลทั้งหมดไปได้เลย
+      onNext(selectedPlatforms, platformsData);
     }
   };
 
@@ -193,41 +137,22 @@ export default function KolRegisterPage3({
       
       {/* ฝั่งซ้าย */}
       <HeroSection 
-        heroTag={t.heroTag} 
-        heroSubtitle={t.heroSubtitle} 
-        footerCopyright={t.footerCopyright} 
+        heroTag={t.common.heroTag} 
+        heroSubtitle={t.common.heroSubtitle} 
+        footerCopyright={t.common.footerCopyright} 
       />
 
       {/* ฝั่งขวา: Form Content */}
       <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
         
-        {/* Language Switcher */}
-        <div className="flex justify-end mb-4 z-20">
-          <div className="bg-white/80 backdrop-blur rounded-lg p-1 border border-slate-200/60 shadow-sm flex items-center text-xs font-semibold">
-            <button 
-              type="button" 
-              onClick={() => setLang('en')} 
-              className={`px-2.5 py-1 rounded-md transition ${lang === 'en' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              EN
-            </button>
-            <span className="text-slate-300">|</span>
-            <button 
-              type="button" 
-              onClick={() => setLang('th')} 
-              className={`px-2.5 py-1 rounded-md transition ${lang === 'th' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              ไทย
-            </button>
-          </div>
-        </div>
+        <div className="mb-4"></div>
 
         {/* Card Form */}
         <div className="my-auto max-w-lg w-full mx-auto">
           
           <div className="text-center mb-5">
-            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.title}</h2>
-            <p className="text-xs text-slate-400 font-medium">{t.stepInfo}</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
+            <p className="text-xs text-slate-400 font-medium">{t.step3.stepInfo}</p>
             
             {/* Stepper Bar (Active 3 ช่องแรก) */}
             <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
@@ -240,7 +165,7 @@ export default function KolRegisterPage3({
             </div>
 
             <p className="text-[11px] text-slate-400 mt-2.5">
-              {t.optionalNotice}
+              {t.common.optionalNotice}
             </p>
           </div>
 
@@ -249,7 +174,7 @@ export default function KolRegisterPage3({
               
               <div className="mb-6">
                 <label className="block text-xs font-bold text-slate-700 mb-3 text-left">
-                  {t.platformLabel}
+                  {t.step3.platformLabel}
                 </label>
 
                 {/* 1. แผงปุ่มเลือก Platform */}
@@ -279,7 +204,7 @@ export default function KolRegisterPage3({
                 </div>
 
                 <p className="text-[11px] text-slate-400 mb-5 text-left">
-                  {t.platformHint}
+                  {t.step3.platformHint}
                 </p>
 
                 {/* 2. แสดงฟอร์มย่อยเมื่อมีการเลือก Platform */}
@@ -287,15 +212,14 @@ export default function KolRegisterPage3({
                   <div className="border border-dashed border-slate-200 rounded-2xl py-3.5 px-4 text-center bg-slate-50/40 flex items-center justify-center gap-2">
                     <Users className="w-4 h-4 text-slate-400" />
                     <span className="text-xs text-slate-400 font-normal">
-                      {t.noPlatformText}
+                      {t.step3.noPlatformText}
                     </span>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {selectedPlatforms.map((platformId) => {
                       const platform = PLATFORMS.find((p) => p.id === platformId)!;
-                      const data = platformsData[platformId];
-                      if (!data) return null;
+                      const data = platformsData[platformId] || { url: '', followers: '', rateVideo: '', ratePhoto: '', rateLive: '' };
 
                       return (
                         <div key={platformId} className="border border-slate-200 rounded-2xl p-4 bg-white shadow-sm transition-all">
@@ -309,7 +233,7 @@ export default function KolRegisterPage3({
                             <button
                               type="button"
                               onClick={() => togglePlatform(platformId)}
-                              className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition"
+                              className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -318,12 +242,12 @@ export default function KolRegisterPage3({
                           {/* อินพุต URL & ผู้ติดตาม */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.profileUrlLabel}</label>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.profileUrlLabel}</label>
                               <div className="relative flex items-center">
                                 <span className="absolute left-3.5 text-slate-400 font-medium text-sm">@</span>
                                 <input
                                   type="text"
-                                  placeholder={t.profileUrlPlaceholder}
+                                  placeholder={t.step3.profileUrlPlaceholder}
                                   value={data.url}
                                   onChange={(e) => handleDataChange(platformId, 'url', e.target.value)}
                                   className="w-full pl-8 pr-3 py-2 text-xs bg-white rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
@@ -331,7 +255,7 @@ export default function KolRegisterPage3({
                               </div>
                             </div>
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.followersLabel}</label>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.followersLabel}</label>
                               <div className="relative flex items-center">
                                 <Users className="absolute left-3.5 w-3.5 h-3.5 text-slate-400" />
                                 <input
@@ -348,13 +272,13 @@ export default function KolRegisterPage3({
                           {/* ตารางค่าตอบแทน (Rate Card) */}
                           <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
                             <div className="flex items-baseline gap-2 mb-3">
-                              <span className="text-xs font-bold text-slate-800">{t.rateCardTitle}</span>
-                              <span className="text-[10px] text-slate-400">{t.rateCardSubtitle}</span>
+                              <span className="text-xs font-bold text-slate-800">{t.step3.rateCardTitle}</span>
+                              <span className="text-[10px] text-slate-400">{t.step3.rateCardSubtitle}</span>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                               {/* วิดีโอ */}
                               <div>
-                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.rateVideo}</label>
+                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateVideo}</label>
                                 <div className="relative flex items-center">
                                   <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
                                   <input
@@ -368,7 +292,7 @@ export default function KolRegisterPage3({
                               </div>
                               {/* ภาพนิ่ง */}
                               <div>
-                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.ratePhoto}</label>
+                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.ratePhoto}</label>
                                 <div className="relative flex items-center">
                                   <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
                                   <input
@@ -382,7 +306,7 @@ export default function KolRegisterPage3({
                               </div>
                               {/* ไลฟ์สด */}
                               <div>
-                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.rateLive}</label>
+                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateLive}</label>
                                 <div className="relative flex items-center">
                                   <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
                                   <input
@@ -412,14 +336,14 @@ export default function KolRegisterPage3({
                     onClick={onBack}
                     className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                   >
-                    {t.backBtn}
+                    {t.common.backBtn}
                   </button>
                   <button
                     type="button"
                     onClick={onSkip}
                     className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
                   >
-                    {t.skipBtn}
+                    {t.common.skipBtn}
                   </button>
                 </div>
 
@@ -427,7 +351,7 @@ export default function KolRegisterPage3({
                   type="submit"
                   className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>{t.submitBtn}</span>
+                  <span>{t.common.submitBtn}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -435,13 +359,13 @@ export default function KolRegisterPage3({
             </form>
 
             <div className="mt-6 pt-2 text-center text-xs text-slate-500">
-              <span>{t.hasAccount} </span>
+              <span>{t.common.hasAccount} </span>
               <button
                 type="button"
                 onClick={onNavigateToLogin}
                 className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
               >
-                {t.loginLink}
+                {t.common.loginLink}
               </button>
             </div>
 
@@ -450,9 +374,9 @@ export default function KolRegisterPage3({
 
         {/* Footer Navigation */}
         <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
-          <a href="#privacy" className="hover:text-slate-600">{t.privacy}</a>
-          <a href="#terms" className="hover:text-slate-600">{t.terms}</a>
-          <a href="#help" className="hover:text-slate-600">{t.help}</a>
+          <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
+          <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>
+          <a href="#help" className="hover:text-slate-600">{t.common.help}</a>
         </div>
 
       </div>

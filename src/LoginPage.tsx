@@ -2,88 +2,98 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
-
-const translations = {
-  th: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'เข้าสู่ระบบ',
-    subtitle: 'กรอกข้อมูลของคุณเพื่อเข้าใช้งานพื้นที่ทำงาน',
-    emailLabel: 'อีเมล',
-    emailPlaceholder: 'name@company.com',
-    passwordLabel: 'รหัสผ่าน',
-    passwordPlaceholder: 'กรอกรหัสผ่านของคุณ',
-    forgotPassword: 'ลืมรหัสผ่าน?',
-    submitBtn: 'เข้าสู่ระบบ',
-    isStaff: 'เป็นพนักงาน?',
-    staffRegister: 'ลงทะเบียนบัญชี',
-    isKol: 'เป็น KOL / อินฟลูเอนเซอร์?',
-    kolRegister: 'ลงทะเบียนเป็น KOL',
-    privacy: 'ความเป็นส่วนตัว',
-    terms: 'ข้อกำหนด',
-    help: 'ศูนย์ช่วยเหลือ',
-    reqEmail: 'กรุณากรอกอีเมล',
-    invalidEmail: 'รูปแบบอีเมลไม่ถูกต้อง',
-    reqPassword: 'กรุณากรอกรหัสผ่าน',
-  },
-  en: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'Log In',
-    subtitle: 'Enter your credentials to access your workspace',
-    emailLabel: 'Email',
-    emailPlaceholder: 'namo@company.com',
-    passwordLabel: 'Password',
-    passwordPlaceholder: 'Enter your password',
-    forgotPassword: 'Forgot password?',
-    submitBtn: 'Log In',
-    isStaff: 'Are you staff?',
-    staffRegister: 'Register Account',
-    isKol: 'Are you a KOL / Influencer?',
-    kolRegister: 'Register as KOL',
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Service',
-    help: 'Help Center',
-    reqEmail: 'Email is required',
-    invalidEmail: 'Invalid email format',
-    reqPassword: 'Password is required',
-  }
-};
+import LanguageSwitcher from './LanguageSwitcher';
+import { useLanguage } from './contexts/LanguageContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [lang, setLang] = useState<'th' | 'en'>('th');
+  const { t } = useLanguage();
+  
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [validations, setValidations] = useState<Record<string, boolean>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const t = translations[lang];
+  const validateField = (name: string, value: string) => {
+    let isValid = false;
+    let errorMsg = '';
+
+    switch (name) {
+      case 'email':
+        if (!value.trim()) {
+          errorMsg = t.login.reqEmail;
+          isValid = false;
+        } else {
+          isValid = /\S+@\S+\.\S+/.test(value);
+          if (!isValid) errorMsg = t.login.invalidEmail;
+        }
+        break;
+      case 'password':
+        if (!value) {
+          errorMsg = t.login.reqPassword;
+          isValid = false;
+        } else {
+          isValid = value.length > 0;
+          if (!isValid) errorMsg = t.login.reqPassword;
+        }
+        break;
+      default:
+        break;
+    }
+
+    setValidations((prev) => ({ ...prev, [name]: isValid }));
+    
+    if (touched[name]) {
+      if (!isValid) {
+        setErrors((prev) => ({ ...prev, [name]: errorMsg }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+    validateField(name, value);
   };
 
-  const validate = () => {
+  const validateAll = () => {
+    setTouched({ email: true, password: true });
+
     const newErrors: Record<string, string> = {};
-    if (!formData.email) {
-      newErrors.email = t.reqEmail;
+    if (!formData.email.trim()) {
+      newErrors.email = t.login.reqEmail;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t.invalidEmail;
+      newErrors.email = t.login.invalidEmail;
     }
-    if (!formData.password) newErrors.password = t.reqPassword;
+    if (!formData.password) {
+      newErrors.password = t.login.reqPassword;
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      alert(lang === 'th' ? 'เข้าสู่ระบบสำเร็จ!' : 'Login Successful!');
+    if (validateAll()) {
+      alert(t.login.successMsg);
     }
+  };
+
+  const getBorderClass = (fieldName: string) => {
+    if (!touched[fieldName]) {
+      return 'border-slate-200 focus:ring-indigo-200';
+    }
+    return validations[fieldName] 
+      ? 'border-slate-200 focus:ring-indigo-200' 
+      : 'border-rose-500 focus:ring-rose-200';
   };
 
   return (
@@ -91,19 +101,16 @@ export default function LoginPage() {
       
       {/* ฝั่งซ้าย */}
       <HeroSection 
-        heroTag={t.heroTag} 
-        heroSubtitle={t.heroSubtitle} 
-        footerCopyright={t.footerCopyright} 
+        heroTag={t.common.heroTag} 
+        heroSubtitle={t.common.heroSubtitle} 
+        footerCopyright={t.common.footerCopyright} 
       />
 
       {/* Login Form ฝั่งขวา */}
       <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
+        
         <div className="flex justify-end mb-4 z-20">
-          <div className="bg-white/80 backdrop-blur rounded-lg p-1 border border-slate-200/60 shadow-sm flex items-center text-xs font-semibold">
-            <button type="button" onClick={() => setLang('en')} className={`px-2.5 py-1 rounded-md transition ${lang === 'en' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}>EN</button>
-            <span className="text-slate-300">|</span>
-            <button type="button" onClick={() => setLang('th')} className={`px-2.5 py-1 rounded-md transition ${lang === 'th' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}>ไทย</button>
-          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="my-auto max-w-md w-full mx-auto">
@@ -111,61 +118,66 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-white rounded-2xl border border-indigo-100 shadow-sm flex items-center justify-center mx-auto mb-3">
               <Lock className="w-5 h-5 text-indigo-500" />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 mb-1">{t.title}</h2>
+            <h2 className="text-2xl font-black text-slate-900 mb-1">{t.login.title}</h2>
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
-            <p className="text-xs text-slate-400 mb-6 text-left">{t.subtitle}</p>
+            <p className="text-xs text-slate-400 mb-6 text-left">{t.login.subtitle}</p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              
+              {/* ช่องอีเมล */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.emailLabel}</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.login.emailLabel}</label>
                 <div className="relative flex items-center">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="email"
                     name="email"
-                    placeholder={t.emailPlaceholder}
+                    autoComplete="email"
+                    placeholder={t.login.emailPlaceholder}
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-3 py-2.5 text-sm bg-slate-50/70 rounded-xl border ${errors.email ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-400`}
+                    className={`w-full pl-10 pr-3 py-2.5 text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('email')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-400`}
                   />
                 </div>
                 {errors.email && <p className="text-xs text-rose-500 mt-1">{errors.email}</p>}
               </div>
 
+              {/* ช่องรหัสผ่าน */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.passwordLabel}</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.login.passwordLabel}</label>
                 <div className="relative flex items-center">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
-                    placeholder={t.passwordPlaceholder}
+                    autoComplete="current-password"
+                    placeholder={t.login.passwordPlaceholder}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50/70 rounded-xl border ${errors.password ? 'border-rose-500' : 'border-slate-200 focus:ring-indigo-200'} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-400`}
+                    className={`w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('password')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-400 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <Eye className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {errors.password && <p className="text-xs text-rose-500 mt-1">{errors.password}</p>}
               </div>
 
               <div className="text-left">
-                <a href="#forgot" className="text-xs text-indigo-600 font-semibold hover:underline">{t.forgotPassword}</a>
+                <a href="#forgot" className="text-xs text-indigo-600 font-semibold hover:underline">{t.login.forgotPassword}</a>
               </div>
 
               <button
                 type="submit"
                 className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center justify-center gap-2 mt-4"
               >
-                <span>{t.submitBtn}</span>
+                <span>{t.login.submitBtn}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
@@ -173,23 +185,23 @@ export default function LoginPage() {
             {/* ลิงก์สลับหน้า */}
             <div className="mt-8 pt-2 text-center text-xs space-y-1.5 text-slate-500">
               <p>
-                {t.isStaff}{' '}
+                {t.login.isStaff}{' '}
                 <button
                   type="button"
                   onClick={() => navigate('/register')}
                   className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
                 >
-                  {t.staffRegister}
+                  {t.login.staffRegister}
                 </button>
               </p>
               <p>
-                {t.isKol}{' '}
+                {t.login.isKol}{' '}
                 <button
                   type="button"
                   onClick={() => navigate('/register-kol')}
                   className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
                 >
-                  {t.kolRegister}
+                  {t.login.kolRegister}
                 </button>
               </p>
             </div>
@@ -197,9 +209,9 @@ export default function LoginPage() {
         </div>
 
         <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
-          <a href="#privacy" className="hover:text-slate-600">{t.privacy}</a>
-          <a href="#terms" className="hover:text-slate-600">{t.terms}</a>
-          <a href="#help" className="hover:text-slate-600">{t.help}</a>
+          <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
+          <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>
+          <a href="#help" className="hover:text-slate-600">{t.common.help}</a>
         </div>
       </div>
 

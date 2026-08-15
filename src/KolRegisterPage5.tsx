@@ -1,142 +1,188 @@
 import React, { useState } from 'react';
 import { ArrowRight, Landmark, User, CreditCard, ChevronDown } from 'lucide-react';
 import HeroSection from './HeroSection';
+import { useLanguage } from './contexts/LanguageContext';
 
 interface KolRegisterPage5Props {
+  initialData?: {
+    bank: string;
+    otherBank: string;
+    accountName: string;
+    accountNumber: string;
+  };
   onBack: () => void;
   onSkip: () => void;
   onNext: (paymentData: any) => void;
   onNavigateToLogin: () => void;
 }
 
-const translations = {
-  th: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'ลงทะเบียน KOL',
-    stepInfo: 'ขั้นตอนที่ 5 จาก 6 · ข้อมูลการชำระเงิน',
-    optionalNotice: 'ไม่บังคับ — คุณสามารถเพิ่มข้อมูลนี้ในโปรไฟล์ได้ภายหลัง',
-    
-    bankLabel: 'ธนาคาร',
-    bankPlaceholder: 'เลือกธนาคาร',
-    accountNameLabel: 'ชื่อบัญชี',
-    accountNamePlaceholder: 'ชื่อเจ้าของบัญชี',
-    accountNumberLabel: 'เลขที่บัญชี',
-    accountNumberPlaceholder: 'เลขที่บัญชี',
-    
-    backBtn: 'ย้อนกลับ',
-    skipBtn: 'ข้าม',
-    submitBtn: 'ดำเนินการต่อ',
-    hasAccount: 'มีบัญชีอยู่แล้ว?',
-    loginLink: 'เข้าสู่ระบบ',
-    privacy: 'ความเป็นส่วนตัว',
-    terms: 'ข้อกำหนด',
-    help: 'ศูนย์ช่วยเหลือ',
-  },
-  en: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'KOL Registration',
-    stepInfo: 'Step 5 of 6 · Payment Information',
-    optionalNotice: 'Optional — You can add this info to your profile later',
-    
-    bankLabel: 'Bank',
-    bankPlaceholder: 'Select Bank',
-    accountNameLabel: 'Account Name',
-    accountNamePlaceholder: 'Account Owner Name',
-    accountNumberLabel: 'Account Number',
-    accountNumberPlaceholder: 'Account Number',
-    
-    backBtn: 'Back',
-    skipBtn: 'Skip',
-    submitBtn: 'Continue',
-    hasAccount: 'Already have an account?',
-    loginLink: 'Log In',
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Service',
-    help: 'Help Center',
-  }
-};
-
-// จำลองรายชื่อธนาคาร
-const BANK_OPTIONS = [
-  { id: 'kbank', name: 'ธนาคารกสิกรไทย (KBANK)' },
-  { id: 'scb', name: 'ธนาคารไทยพาณิชย์ (SCB)' },
-  { id: 'bbl', name: 'ธนาคารกรุงเทพ (BBL)' },
-  { id: 'ktb', name: 'ธนาคารกรุงไทย (KTB)' },
-  { id: 'bay', name: 'ธนาคารกรุงศรีอยุธยา (BAY)' },
-  { id: 'ttb', name: 'ธนาคารทหารไทยธนชาต (TTB)' },
-  { id: 'gsb', name: 'ธนาคารออมสิน (GSB)' },
-];
-
 export default function KolRegisterPage5({
+  initialData,
   onBack,
   onSkip,
   onNext,
   onNavigateToLogin,
 }: KolRegisterPage5Props) {
-  const [lang, setLang] = useState<'th' | 'en'>('th');
+  const { t } = useLanguage();
   
+  // นำ initialData มาใส่เป็นค่าเริ่มต้น (ถ้ามี)
   const [formData, setFormData] = useState({
-    bank: '',
-    accountName: '',
-    accountNumber: ''
+    bank: initialData?.bank || '',
+    otherBank: initialData?.otherBank || '',
+    accountName: initialData?.accountName || '',
+    accountNumber: initialData?.accountNumber || ''
   });
 
-  const t = translations[lang];
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const validateField = (name: string, value: string, currentData = formData) => {
+    let errorMsg = '';
+
+    switch (name) {
+      case 'bank':
+        if (!value) {
+          errorMsg = 'Please select a bank';
+        }
+        break;
+      case 'otherBank':
+        if (currentData.bank === 'other' && !value.trim()) {
+          errorMsg = 'Please specify bank name';
+        }
+        break;
+      case 'accountName':
+        if (!value.trim()) {
+          errorMsg = 'Account name is required';
+        }
+        break;
+      case 'accountNumber':
+        if (!value.trim()) {
+          errorMsg = 'Account number is required';
+        } else if (!/^[0-9]{8,15}$/.test(value)) {
+          errorMsg = 'Invalid account number format';
+        }
+        break;
+      default:
+        break;
+    }
+
+    return errorMsg;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // กรองเฉพาะตัวเลขสำหรับเลขที่บัญชี
+    let processedValue = value;
+    if (name === 'accountNumber') {
+      processedValue = value.replace(/\D/g, '').slice(0, 15);
+    }
+
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const updatedData = { ...formData, [name]: processedValue };
+    setFormData(updatedData);
+
+    const errorMsg = validateField(name, processedValue, updatedData);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (errorMsg) {
+        newErrors[name] = errorMsg;
+      } else {
+        delete newErrors[name];
+      }
+      return newErrors;
+    });
+
+    // หากเปลี่ยนจาก "อื่นๆ" เป็นธนาคารอื่น ให้เคลียร์ error ของช่อง otherBank ออก
+    if (name === 'bank' && value !== 'other') {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.otherBank;
+        return newErrors;
+      });
+    }
   };
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
-    onNext(formData);
+    
+    const newErrors: Record<string, string> = {};
+    const fieldsToValidate = ['bank', 'accountName', 'accountNumber'];
+    if (formData.bank === 'other') {
+      fieldsToValidate.push('otherBank');
+    }
+
+    fieldsToValidate.forEach((field) => {
+      const errorMsg = validateField(field, formData[field as keyof typeof formData], formData);
+      if (errorMsg) {
+        newErrors[field] = errorMsg;
+      }
+    });
+
+    setTouched({
+      bank: true,
+      otherBank: true,
+      accountName: true,
+      accountNumber: true,
+    });
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      onNext(formData);
+    }
   };
+
+  const getInputClassName = (fieldName: string, isSelect = false) => {
+    const baseClass = isSelect
+      ? "w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm rounded-xl border outline-none transition appearance-none cursor-pointer"
+      : "w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300";
+    
+    if (touched[fieldName] && errors[fieldName]) {
+      return `${baseClass} border-rose-500 focus:ring-rose-200 ${isSelect ? 'bg-rose-50/20' : ''}`;
+    }
+    return `${baseClass} border-slate-200 focus:ring-indigo-200 ${isSelect ? 'bg-slate-50/70' : ''}`;
+  };
+
+  // รายชื่อธนาคารอ้างอิงคีย์จากไฟล์ภาษา
+  const bankKeys = [
+    'bangkok',
+    'kasikorn',
+    'scb',
+    'krungthai',
+    'krungsri',
+    'ttb',
+    'uob',
+    'gsb',
+    'baac',
+    'cimb',
+    'kiatnakin',
+    'tisco',
+    'lhbank',
+    'ghb',
+    'other'
+  ];
 
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
       
       {/* ฝั่งซ้าย: Hero Section */}
       <HeroSection 
-        heroTag={t.heroTag} 
-        heroSubtitle={t.heroSubtitle} 
-        footerCopyright={t.footerCopyright} 
+        heroTag={t.common.heroTag} 
+        heroSubtitle={t.common.heroSubtitle} 
+        footerCopyright={t.common.footerCopyright} 
       />
 
       {/* ฝั่งขวา: Form Content */}
       <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
         
-        {/* Language Switcher */}
-        <div className="flex justify-end mb-4 z-20">
-          <div className="bg-white/80 backdrop-blur rounded-lg p-1 border border-slate-200/60 shadow-sm flex items-center text-xs font-semibold">
-            <button 
-              type="button" 
-              onClick={() => setLang('en')} 
-              className={`px-2.5 py-1 rounded-md transition ${lang === 'en' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              EN
-            </button>
-            <span className="text-slate-300">|</span>
-            <button 
-              type="button" 
-              onClick={() => setLang('th')} 
-              className={`px-2.5 py-1 rounded-md transition ${lang === 'th' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              ไทย
-            </button>
-          </div>
-        </div>
+        <div className="mb-4"></div>
 
         {/* Card Form */}
         <div className="my-auto max-w-lg w-full mx-auto">
           
           <div className="text-center mb-5">
-            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.title}</h2>
-            <p className="text-xs text-slate-400 font-medium">{t.stepInfo}</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
+            <p className="text-xs text-slate-400 font-medium">{t.step5.stepInfo}</p>
             
             {/* Stepper Bar (Active 5 ช่อง) */}
             <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
@@ -149,65 +195,90 @@ export default function KolRegisterPage5({
             </div>
 
             <p className="text-[11px] text-slate-400 mt-2.5">
-              {t.optionalNotice}
+              {t.common.optionalNotice}
             </p>
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
-            <form onSubmit={handleContinue}>
+            <form onSubmit={handleContinue} noValidate>
               
               <div className="space-y-4 mb-8">
                 
                 {/* ธนาคาร (Select) */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.bankLabel}</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.bankLabel}</label>
                   <div className="relative flex items-center">
                     <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
                     <select
                       name="bank"
                       value={formData.bank}
                       onChange={handleChange}
-                      className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition appearance-none cursor-pointer ${formData.bank ? 'bg-slate-50/70 text-slate-800' : 'bg-slate-50/70 text-slate-400'}`}
+                      className={`${getInputClassName('bank', true)} ${formData.bank ? 'text-slate-800' : 'text-slate-400'}`}
                     >
-                      <option value="" disabled hidden>{t.bankPlaceholder}</option>
-                      {BANK_OPTIONS.map((bank) => (
-                        <option key={bank.id} value={bank.id} className="text-slate-800">{bank.name}</option>
+                      <option value="" disabled hidden>{t.step5.bankPlaceholder}</option>
+                      {bankKeys.map((key) => (
+                        <option key={key} value={key} className="text-slate-800">
+                          {t.step5.banks[key as keyof typeof t.step5.banks]}
+                        </option>
                       ))}
                     </select>
                     <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-2.5 pointer-events-none" />
                   </div>
+                  {errors.bank && <p className="text-[11px] text-rose-500 mt-1">{errors.bank}</p>}
                 </div>
+
+                {/* แสดงช่องกรอกเพิ่มเติมถ้าเลือก "อื่นๆ" */}
+                {formData.bank === 'other' && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.otherBankPlaceholder}</label>
+                    <div className="relative flex items-center">
+                      <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                      <input
+                        type="text"
+                        name="otherBank"
+                        placeholder={t.step5.otherBankPlaceholder}
+                        value={formData.otherBank}
+                        onChange={handleChange}
+                        className={getInputClassName('otherBank')}
+                      />
+                    </div>
+                    {errors.otherBank && <p className="text-[11px] text-rose-500 mt-1">{errors.otherBank}</p>}
+                  </div>
+                )}
 
                 {/* ชื่อบัญชี */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.accountNameLabel}</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.accountNameLabel}</label>
                   <div className="relative flex items-center">
                     <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
                     <input
                       type="text"
                       name="accountName"
-                      placeholder={t.accountNamePlaceholder}
+                      placeholder={t.step5.accountNamePlaceholder}
                       value={formData.accountName}
                       onChange={handleChange}
-                      className="w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition text-slate-800 placeholder-slate-300"
+                      className={getInputClassName('accountName')}
                     />
                   </div>
+                  {errors.accountName && <p className="text-[11px] text-rose-500 mt-1">{errors.accountName}</p>}
                 </div>
 
                 {/* เลขที่บัญชี */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.accountNumberLabel}</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.accountNumberLabel}</label>
                   <div className="relative flex items-center">
                     <CreditCard className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
                     <input
                       type="text"
                       name="accountNumber"
-                      placeholder={t.accountNumberPlaceholder}
+                      maxLength={15}
+                      placeholder={t.step5.accountNumberPlaceholder}
                       value={formData.accountNumber}
                       onChange={handleChange}
-                      className="w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition text-slate-800 placeholder-slate-300"
+                      className={getInputClassName('accountNumber')}
                     />
                   </div>
+                  {errors.accountNumber && <p className="text-[11px] text-rose-500 mt-1">{errors.accountNumber}</p>}
                 </div>
 
               </div>
@@ -220,14 +291,14 @@ export default function KolRegisterPage5({
                     onClick={onBack}
                     className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                   >
-                    {t.backBtn}
+                    {t.common.backBtn}
                   </button>
                   <button
                     type="button"
                     onClick={onSkip}
                     className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
                   >
-                    {t.skipBtn}
+                    {t.common.skipBtn}
                   </button>
                 </div>
 
@@ -235,7 +306,7 @@ export default function KolRegisterPage5({
                   type="submit"
                   className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>{t.submitBtn}</span>
+                  <span>{t.common.submitBtn}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -243,13 +314,13 @@ export default function KolRegisterPage5({
             </form>
 
             <div className="mt-8 pt-2 text-center text-xs text-slate-500 border-t border-slate-50">
-              <span>{t.hasAccount} </span>
+              <span>{t.common.hasAccount} </span>
               <button
                 type="button"
                 onClick={onNavigateToLogin}
                 className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
               >
-                {t.loginLink}
+                {t.common.loginLink}
               </button>
             </div>
 
@@ -258,9 +329,9 @@ export default function KolRegisterPage5({
 
         {/* Footer Navigation */}
         <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
-          <a href="#privacy" className="hover:text-slate-600">{t.privacy}</a>
-          <a href="#terms" className="hover:text-slate-600">{t.terms}</a>
-          <a href="#help" className="hover:text-slate-600">{t.help}</a>
+          <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
+          <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>
+          <a href="#help" className="hover:text-slate-600">{t.common.help}</a>
         </div>
 
       </div>

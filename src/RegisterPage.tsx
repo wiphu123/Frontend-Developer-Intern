@@ -1,94 +1,14 @@
 import React, { useState } from 'react';
-import { User, Mail, Briefcase, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Mail, Briefcase, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
-
-const translations = {
-  th: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'ลงทะเบียนเจ้าหน้าที่',
-    subtitle: 'ลงทะเบียนบัญชีเพื่อขอสิทธิ์เข้าถึงพื้นที่ทำงาน',
-    firstNameLabel: 'ชื่อ',
-    firstNamePlaceholder: 'ชื่อ',
-    lastNameLabel: 'นามสกุล',
-    lastNamePlaceholder: 'นามสกุล',
-    emailLabel: 'ที่อยู่อีเมล',
-    emailPlaceholder: 'namo@company.com',
-    positionLabel: 'ตำแหน่ง',
-    positionPlaceholder: 'เลือกตำแหน่ง',
-    posMarketing: 'การตลาด',
-    posMarketingManager: 'ผู้จัดการการตลาด',
-    posDirector: 'ผู้อำนวยการ',
-    posAccounting: 'บัญชี',
-    passwordLabel: 'รหัสผ่าน',
-    passwordPlaceholder: 'สร้างรหัสผ่าน',
-    passwordHint: 'อย่างน้อย 8 ตัวอักษร',
-    confirmPasswordLabel: 'ยืนยันรหัสผ่าน',
-    confirmPasswordPlaceholder: 'กรอกรหัสผ่านอีกครั้ง',
-    approvalNotice: 'บัญชีเจ้าหน้าที่ใหม่ต้องได้รับการอนุมัติจากผู้ดูแลระบบก่อนจึงจะเข้าใช้งานได้',
-    submitBtn: 'ส่งการลงทะเบียน',
-    hasAccount: 'มีบัญชีอยู่แล้ว?',
-    loginLink: 'เข้าสู่ระบบ',
-    privacy: 'ความเป็นส่วนตัว',
-    terms: 'ข้อกำหนด',
-    help: 'ศูนย์ช่วยเหลือ',
-    reqFirstName: 'กรุณากรอกชื่อ',
-    reqLastName: 'กรุณากรอกนามสกุล',
-    reqEmail: 'กรุณากรอกอีเมล',
-    invalidEmail: 'รูปแบบอีเมลไม่ถูกต้อง',
-    reqPosition: 'กรุณาเลือกตำแหน่ง',
-    reqPassword: 'กรุณากรอกรหัสผ่าน',
-    minPassword: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
-    matchPassword: 'รหัสผ่านไม่ตรงกัน',
-  },
-  en: {
-    heroTag: 'JSW KOL PLATFORM',
-    heroSubtitle: 'A simpler way to manage campaigns, creators, approvals, and results.',
-    footerCopyright: '© JSW All rights reserved',
-    title: 'Staff Registration',
-    subtitle: 'Register an account to request workspace access',
-    firstNameLabel: 'First Name',
-    firstNamePlaceholder: 'First Name',
-    lastNameLabel: 'Last Name',
-    lastNamePlaceholder: 'Last Name',
-    emailLabel: 'Email Address',
-    emailPlaceholder: 'namo@company.com',
-    positionLabel: 'Position',
-    positionPlaceholder: 'Select position',
-    posMarketing: 'Marketing',
-    posMarketingManager: 'Marketing Manager',
-    posDirector: 'Director',
-    posAccounting: 'Accounting',
-    passwordLabel: 'Password',
-    passwordPlaceholder: 'Create password',
-    passwordHint: 'At least 8 characters',
-    confirmPasswordLabel: 'Confirm Password',
-    confirmPasswordPlaceholder: 'Re-enter password',
-    approvalNotice: 'New staff accounts require admin approval before being able to log in.',
-    submitBtn: 'Submit Registration',
-    hasAccount: 'Already have an account?',
-    loginLink: 'Log In',
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Service',
-    help: 'Help Center',
-    reqFirstName: 'First name is required',
-    reqLastName: 'Last name is required',
-    reqEmail: 'Email is required',
-    invalidEmail: 'Invalid email format',
-    reqPosition: 'Position is required',
-    reqPassword: 'Password is required',
-    minPassword: 'Password must be at least 8 characters',
-    matchPassword: 'Passwords do not match',
-  }
-};
+import { useLanguage } from './contexts/LanguageContext';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [lang, setLang] = useState<'th' | 'en'>('th');
+  const { t } = useLanguage();
+
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -98,93 +18,119 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [validations, setValidations] = useState<Record<string, boolean>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const t = translations[lang];
-
-  // Real-time validation function
-  const validateField = (name: string, value: string) => {
+ const validateField = (name: string, value: string, currentFormData = formData) => {
     let isValid = false;
     let errorMsg = '';
 
     switch (name) {
       case 'firstName':
         isValid = value.trim().length > 0;
-        if (!isValid) errorMsg = t.reqFirstName;
+        if (!isValid) errorMsg = t.register.reqFirstName;
         break;
       case 'lastName':
         isValid = value.trim().length > 0;
-        if (!isValid) errorMsg = t.reqLastName;
+        if (!isValid) errorMsg = t.register.reqLastName;
         break;
       case 'email':
-        isValid = /\S+@\S+\.\S+/.test(value);
-        if (!value) errorMsg = t.reqEmail;
-        else if (!isValid) errorMsg = t.invalidEmail;
+        if (!value.trim()) {
+          errorMsg = t.register.reqEmail;
+          isValid = false;
+        } else {
+          isValid = /\S+@\S+\.\S+/.test(value);
+          if (!isValid) errorMsg = t.register.invalidEmail;
+        }
         break;
       case 'position':
         isValid = value.length > 0;
-        if (!isValid) errorMsg = t.reqPosition;
+        if (!isValid) errorMsg = t.register.reqPosition; 
         break;
       case 'password':
-        isValid = value.length >= 8;
-        if (!value) errorMsg = t.reqPassword;
-        else if (!isValid) errorMsg = t.minPassword;
+        if (!value) {
+          errorMsg = t.register.reqPassword;
+          isValid = false;
+        } else {
+          isValid = value.length >= 8;
+          if (!isValid) errorMsg = t.register.shortPassword;
+        }
         break;
       case 'confirmPassword':
-        isValid = value === formData.password && value.length > 0;
-        if (!value) errorMsg = t.reqPassword;
-        else if (!isValid) errorMsg = t.matchPassword;
+        if (!value) {
+          errorMsg = t.register.passwordMismatch;
+          isValid = false;
+        } else {
+          isValid = value === currentFormData.password;
+          // ดึงค่ามาจากตารางภาษาโดยตรงตรงนี้ครับ
+          if (!isValid) errorMsg = t.register.passwordMismatch;
+        }
         break;
       default:
         break;
     }
 
     setValidations((prev) => ({ ...prev, [name]: isValid }));
-    if (!isValid && value.trim()) {
-      setErrors((prev) => ({ ...prev, [name]: errorMsg }));
-    } else {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+    
+    if (touched[name]) {
+      if (!isValid) {
+        setErrors((prev) => ({ ...prev, [name]: errorMsg }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Real-time validation after field is touched
-    if (touched[name]) {
-      validateField(name, value);
-    }
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    // บันทึกว่าช่องนี้เคยถูกใช้งาน/พิมพ์แล้วทันที
     setTouched((prev) => ({ ...prev, [name]: true }));
-    validateField(name, value);
+
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+    
+    validateField(name, value, updatedFormData);
+
+    // ถ้าเปลี่ยนรหัสผ่าน ให้สั่งเช็คช่องยืนยันรหัสผ่านแบบเรียลไทล์ทันทีด้วย
+    if (name === 'password') {
+      setTouched((prev) => ({ ...prev, confirmPassword: true }));
+      validateField('confirmPassword', updatedFormData.confirmPassword, updatedFormData);
+    }
   };
 
-  const validate = () => {
+  const validateAll = () => {
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      position: true,
+      password: true,
+      confirmPassword: true,
+    });
+
     const newErrors: Record<string, string> = {};
-    if (!formData.firstName) newErrors.firstName = t.reqFirstName;
-    if (!formData.lastName) newErrors.lastName = t.reqLastName;
-    if (!formData.email) {
-      newErrors.email = t.reqEmail;
+    if (!formData.firstName.trim()) newErrors.firstName = t.register.reqFirstName;
+    if (!formData.lastName.trim()) newErrors.lastName = t.register.reqLastName;
+    if (!formData.email.trim()) {
+      newErrors.email = t.register.reqEmail;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t.invalidEmail;
+      newErrors.email = t.register.invalidEmail;
     }
-    if (!formData.position) newErrors.position = t.reqPosition;
+    if (!formData.position) newErrors.position = t.register.reqPosition;
     if (!formData.password) {
-      newErrors.password = t.reqPassword;
+      newErrors.password = t.register.reqPassword;
     } else if (formData.password.length < 8) {
-      newErrors.password = t.minPassword;
+      newErrors.password = t.register.shortPassword;
     }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t.matchPassword;
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = t.register.reqPassword;
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = t.register.passwordMismatch;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -192,238 +138,198 @@ export default function RegisterPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      alert(lang === 'th' ? 'ส่งการลงทะเบียนเรียบร้อยแล้ว!' : 'Registration submitted successfully!');
+    if (validateAll()) {
+      alert(t.register.successMsg);
     }
   };
 
-  // Helper function to get field status
-  const getFieldStatus = (fieldName: string) => {
-    if (!touched[fieldName]) return 'neutral';
-    return validations[fieldName] ? 'valid' : 'invalid';
-  };
-
-  // Helper function for input border color
   const getBorderClass = (fieldName: string) => {
-    const status = getFieldStatus(fieldName);
-    // แสดงสีแดงเฉพาะตอนที่ผิด
-    if (status === 'invalid') return 'border-rose-500 focus:ring-rose-200';
-    // สีปกติทั้งตอนที่ถูกและตอนไม่แตะ
-    return 'border-slate-200 focus:ring-indigo-200';
+    if (!touched[fieldName]) {
+      return 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-100';
+    }
+    return validations[fieldName] 
+      ? 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-100' 
+      : 'border-rose-500 focus:border-rose-500 focus:ring-rose-200';
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row font-['Prompt'] relative bg-[#F4F2FF]">
       
-      {/*  ฝั่งซ้าย: */}
+      {/* ฝั่งซ้าย */}
       <HeroSection 
-        heroTag={t.heroTag} 
-        heroSubtitle={t.heroSubtitle} 
-        footerCopyright={t.footerCopyright} 
+        heroTag={t.common.heroTag} 
+        heroSubtitle={t.common.heroSubtitle} 
+        footerCopyright={t.common.footerCopyright} 
       />
 
-      {/* ================= ฝั่งขวา: Register Form ================= */}
-      <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
+      {/* ฝั่งขวา: Register Form */}
+      <div className="lg:w-1/2 w-full flex flex-col items-center justify-center p-6 sm:p-10 bg-[#F4F2FF] relative min-h-screen py-12">
         
-        {/* Language Switcher */}
-        <div className="flex justify-end mb-4 z-20">
-          <div className="bg-white/80 backdrop-blur rounded-lg p-1 border border-slate-200/60 shadow-sm flex items-center text-xs font-semibold">
-            <button 
-              type="button" 
-              onClick={() => setLang('en')} 
-              className={`px-2.5 py-1 rounded-md transition ${lang === 'en' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              EN
-            </button>
-            <span className="text-slate-300">|</span>
-            <button 
-              type="button" 
-              onClick={() => setLang('th')} 
-              className={`px-2.5 py-1 rounded-md transition ${lang === 'th' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              ไทย
-            </button>
-          </div>
-        </div>
+        <div className="w-full max-w-[460px]">
+          
+          <h2 className="text-[28px] sm:text-[32px] font-bold text-[#1E1B4B] mb-6 text-center">
+            {t.register.title}
+          </h2>
 
-        {/* Card Form Wrapper */}
-        <div className="my-auto max-w-lg w-full mx-auto">
-          <div className="text-center mb-5">
-            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.title}</h2>
-          </div>
+          <div className="bg-white rounded-[20px] shadow-sm p-6 sm:p-8 w-full border border-gray-100">
+            
+            <p className="text-[13px] text-gray-500 mb-6 text-left">
+              {t.register.subtitle}
+            </p>
 
-          <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
-            <p className="text-xs text-slate-400 mb-5 text-left">{t.subtitle}</p>
-
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               
-              {/* แถว 1: ชื่อ - นามสกุล */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* ชื่อ - นามสกุล */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{t.firstNameLabel}</label>
+                  <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.firstNameLabel}</label>
                   <div className="relative flex items-center">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                    <User className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       name="firstName"
-                      placeholder={t.firstNamePlaceholder}
+                      placeholder={t.register.firstNamePlaceholder}
                       value={formData.firstName}
                       onChange={handleChange}
-                      onBlur={handleBlur}
-                      className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('firstName')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                      className={`w-full pl-10 pr-3 py-2.5 text-[14px] bg-white rounded-xl border ${getBorderClass('firstName')} focus:outline-none focus:ring-4 transition text-gray-800 placeholder-gray-400`}
                     />
                   </div>
-                  {errors.firstName && <p className="text-[11px] text-rose-500 mt-0.5">{errors.firstName}</p>}
+                  {errors.firstName && <p className="text-[11px] text-rose-500 mt-1">{errors.firstName}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{t.lastNameLabel}</label>
+                  <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.lastNameLabel}</label>
                   <div className="relative flex items-center">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                    <User className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       name="lastName"
-                      placeholder={t.lastNamePlaceholder}
+                      placeholder={t.register.lastNamePlaceholder}
                       value={formData.lastName}
                       onChange={handleChange}
-                      onBlur={handleBlur}
-                      className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('lastName')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                      className={`w-full pl-10 pr-3 py-2.5 text-[14px] bg-white rounded-xl border ${getBorderClass('lastName')} focus:outline-none focus:ring-4 transition text-gray-800 placeholder-gray-400`}
                     />
                   </div>
-                  {errors.lastName && <p className="text-[11px] text-rose-500 mt-0.5">{errors.lastName}</p>}
+                  {errors.lastName && <p className="text-[11px] text-rose-500 mt-1">{errors.lastName}</p>}
                 </div>
               </div>
 
-              {/* ที่อยู่อีเมล */}
+              {/* อีเมล */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t.emailLabel}</label>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.emailLabel}</label>
                 <div className="relative flex items-center">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <Mail className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="email"
                     name="email"
-                    placeholder={t.emailPlaceholder}
+                    placeholder={t.register.emailPlaceholder}
                     value={formData.email}
                     onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={`w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('email')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                    className={`w-full pl-10 pr-3 py-2.5 text-[14px] bg-white rounded-xl border ${getBorderClass('email')} focus:outline-none focus:ring-4 transition text-gray-800 placeholder-gray-400`}
                   />
                 </div>
-                {errors.email && <p className="text-[11px] text-rose-500 mt-0.5">{errors.email}</p>}
+                {errors.email && <p className="text-[11px] text-rose-500 mt-1">{errors.email}</p>}
               </div>
 
-              {/* ตำแหน่ง (Dropdown) */}
+              {/* ตำแหน่ง */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t.positionLabel}</label>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.positionLabel}</label>
                 <div className="relative flex items-center">
-                  <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <Briefcase className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <select
                     name="position"
                     value={formData.position}
                     onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={`w-full pl-10 pr-8 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('position')} focus:outline-none focus:ring-2 transition ${formData.position ? 'text-slate-800' : 'text-slate-300'} appearance-none cursor-pointer`}
+                    className={`w-full pl-10 pr-8 py-2.5 text-[14px] bg-white rounded-xl border ${getBorderClass('position')} focus:outline-none focus:ring-4 transition ${formData.position ? 'text-gray-800' : 'text-gray-400'} appearance-none cursor-pointer`}
                   >
-                    <option value="" disabled hidden>{t.positionPlaceholder}</option>
-                    <option value="marketing" className="text-slate-800">{t.posMarketing}</option>
-                    <option value="marketing_manager" className="text-slate-800">{t.posMarketingManager}</option>
-                    <option value="director" className="text-slate-800">{t.posDirector}</option>
-                    <option value="accounting" className="text-slate-800">{t.posAccounting}</option>
+                    <option value="" disabled hidden>{t.register.positionPlaceholder}</option>
+                    <option value="marketing" className="text-gray-800">{t.register.posMarketing}</option>
+                    <option value="marketing_manager" className="text-gray-800">{t.register.posMarketingManager}</option>
+                    <option value="director" className="text-gray-800">{t.register.posDirector}</option>
+                    <option value="accounting" className="text-gray-800">{t.register.posAccounting}</option>
                   </select>
-                  <div className="absolute right-3.5 top-2.5 pointer-events-none text-slate-400 text-[10px]">▼</div>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-[10px]">▼</div>
                 </div>
-                {errors.position && <p className="text-[11px] text-rose-500 mt-0.5">{errors.position}</p>}
+                {errors.position && <p className="text-[11px] text-rose-500 mt-1">{errors.position}</p>}
               </div>
 
               {/* รหัสผ่าน */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t.passwordLabel}</label>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.passwordLabel}</label>
                 <div className="relative flex items-center">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <Lock className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
-                    placeholder={t.passwordPlaceholder}
+                    autoComplete="new-password"
+                    placeholder={t.register.passwordPlaceholder}
                     value={formData.password}
                     onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('password')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                    className={`w-full pl-10 pr-10 py-2.5 text-[14px] bg-white rounded-xl border ${getBorderClass('password')} focus:outline-none focus:ring-4 transition text-gray-800 placeholder-gray-400 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <Eye className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-0.5">{t.passwordHint}</p>
-                {errors.password && <p className="text-[11px] text-rose-500 mt-0.5">{errors.password}</p>}
+                <p className="text-[11px] text-gray-400 mt-1.5">{t.register.passwordHint}</p>
+                {errors.password && <p className="text-[11px] text-rose-500 mt-1">{errors.password}</p>}
               </div>
 
               {/* ยืนยันรหัสผ่าน */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t.confirmPasswordLabel}</label>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.confirmPasswordLabel}</label>
                 <div className="relative flex items-center">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <Lock className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showPassword ? 'text' : 'password'}
                     name="confirmPassword"
-                    placeholder={t.confirmPasswordPlaceholder}
+                    autoComplete="new-password"
+                    placeholder={t.register.confirmPasswordPlaceholder}
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={`w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50/70 rounded-xl border ${getBorderClass('confirmPassword')} focus:outline-none focus:ring-2 transition text-slate-800 placeholder-slate-300`}
+                    className={`w-full pl-10 pr-3 py-2.5 text-[14px] bg-white rounded-xl border ${getBorderClass('confirmPassword')} focus:outline-none focus:ring-4 transition text-gray-800 placeholder-gray-400 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden`}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
-                {errors.confirmPassword && <p className="text-[11px] text-rose-500 mt-0.5">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-[11px] text-rose-500 mt-1">{errors.confirmPassword}</p>}
               </div>
 
               {/* Notice Banner */}
-              <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-2.5 flex items-start gap-2.5 mt-2">
-                <ShieldCheck className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-slate-500 leading-snug">{t.approvalNotice}</p>
+              <div className="bg-[#F8F9FA] border border-gray-100 rounded-xl p-3 flex items-start gap-2.5 mt-2">
+                <ShieldCheck className="w-[18px] h-[18px] text-gray-400 shrink-0 mt-0.5" />
+                <p className="text-[12px] text-gray-500 leading-relaxed">
+                  {t.register.approvalNotice}
+                </p>
               </div>
 
-              {/* ปุ่มบันทึกข้อมูล */}
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3 px-4 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-[14px] font-medium rounded-xl shadow-sm transition-colors duration-200 flex items-center justify-center gap-2 mt-4"
               >
-                <span>{t.submitBtn}</span>
+                <span>{t.register.submitBtn}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
-            {/* ปุ่มกลับหน้าเข้าสู่ระบบ */}
-            <div className="mt-5 text-center text-xs text-slate-500">
-              <span>{t.hasAccount} </span>
+            {/* Login Link */}
+            <div className="mt-8 pt-6 border-t border-gray-100 text-center text-[13px] text-gray-500">
+              <span>{t.common.hasAccount} </span>
               <button
                 type="button"
                 onClick={() => navigate('/login')}
-                className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
+                className="text-[#6366F1] font-semibold hover:underline bg-transparent border-none cursor-pointer"
               >
-                {t.loginLink}
+                {t.common.loginLink}
               </button>
             </div>
+
           </div>
         </div>
-
-        {/* Footer ด้านล่าง */}
-        <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
-          <a href="#privacy" className="hover:text-slate-600">{t.privacy}</a>
-          <a href="#terms" className="hover:text-slate-600">{t.terms}</a>
-          <a href="#help" className="hover:text-slate-600">{t.help}</a>
-        </div>
       </div>
-
     </div>
   );
 }

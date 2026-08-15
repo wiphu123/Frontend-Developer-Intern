@@ -8,13 +8,8 @@ import KolRegisterPage5 from './KolRegisterPage5';
 import KolRegisterPage6 from './KolRegisterPage6';
 
 interface StepData {
-  step1?: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    lineId: string;
-  };
-  step2?: string[];
+  step1?: any;
+  step2?: any;
   step3?: any;
   step4?: any;
   step5?: any;
@@ -33,7 +28,9 @@ export default function KolRegistrationFlow() {
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Final submission
+      // Final submission (กรณีกด Next ในหน้าสุดท้าย)
+      const finalPayload = { ...stepData };
+      console.log('Registration Data:', finalPayload);
       alert('ลงทะเบียนเสร็จสิ้น!');
       navigate('/login');
     }
@@ -59,19 +56,28 @@ export default function KolRegistrationFlow() {
   };
 
   const handleSubmit = (finalData: any) => {
-    setStepData((prev) => ({ ...prev, step6: finalData }));
+    const completeData = { ...stepData, step6: finalData };
+    setStepData(completeData);
+    console.log('All Registration Steps Data:', completeData); // ข้อมูลทั้งหมดตั้งแต่สเต็ป 1-6 พร้อมส่ง Backend
     alert('ลงทะเบียนเสร็จสิ้น!');
     navigate('/login');
   };
 
-  // Render the appropriate step component
+  // Render the appropriate step componentพร้อมส่งข้อมูลเดิม (initialData) กลับไปแสดงผล
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <KolRegisterPage onNext={handleNext} onNavigateToLogin={handleNavigateToLogin} />;
+        return (
+          <KolRegisterPage 
+            initialData={stepData.step1}
+            onNext={handleNext} 
+            onNavigateToLogin={handleNavigateToLogin} 
+          />
+        );
       case 2:
         return (
           <KolRegisterPage2
+            initialData={stepData.step2}
             onBack={handleBack}
             onSkip={handleSkip}
             onNext={handleNext}
@@ -81,6 +87,7 @@ export default function KolRegistrationFlow() {
       case 3:
         return (
           <KolRegisterPage3
+            initialData={stepData.step3}
             onBack={handleBack}
             onSkip={handleSkip}
             onNext={handleNext}
@@ -90,6 +97,7 @@ export default function KolRegistrationFlow() {
       case 4:
         return (
           <KolRegisterPage4
+            initialData={stepData.step4}
             onBack={handleBack}
             onSkip={handleSkip}
             onNext={handleNext}
@@ -99,6 +107,7 @@ export default function KolRegistrationFlow() {
       case 5:
         return (
           <KolRegisterPage5
+            initialData={stepData.step5}
             onBack={handleBack}
             onSkip={handleSkip}
             onNext={handleNext}
@@ -108,13 +117,20 @@ export default function KolRegistrationFlow() {
       case 6:
         return (
           <KolRegisterPage6
+            initialData={stepData.step6}
             onBack={handleBack}
             onSubmit={handleSubmit}
             onNavigateToLogin={handleNavigateToLogin}
           />
         );
       default:
-        return <KolRegisterPage onNext={handleNext} onNavigateToLogin={handleNavigateToLogin} />;
+        return (
+          <KolRegisterPage 
+            initialData={stepData.step1}
+            onNext={handleNext} 
+            onNavigateToLogin={handleNavigateToLogin} 
+          />
+        );
     }
   };
 
