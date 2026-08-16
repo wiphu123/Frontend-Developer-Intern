@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Users, Trash2, AlertCircle } from 'lucide-react';
-import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
 
 interface KolRegisterPage3Props {
@@ -97,7 +96,6 @@ export default function KolRegisterPage3({
   const [platformsData, setPlatformsData] = useState<Record<string, PlatformData>>(initialData?.platformsData || {});
   const [errorMsg, setErrorMsg] = useState('');
 
-  // คอยอัปเดต State ทันทีเมื่อ initialData มีการเปลี่ยนแปลง (เช่น ตอนกดปุ่ม Back กลับมา)
   useEffect(() => {
     if (initialData) {
       setSelectedPlatforms(initialData.selectedPlatforms || []);
@@ -152,249 +150,233 @@ export default function KolRegisterPage3({
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
+    /* ปรับคลาสหลักให้ใช้ w-full h-screen lg:h-full พร้อม snap-start และ overflow-y-auto เพื่อจัดกึ่งกลางและเลื่อนได้พอดีในฝั่งขวา */
+    <div className="w-full h-screen lg:h-full snap-start lg:snap-none flex flex-col justify-center items-center p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative overflow-y-auto">
       
-      <HeroSection 
-        heroTag={t.common.heroTag} 
-        heroSubtitle={t.common.heroSubtitle} 
-        footerCopyright={t.common.footerCopyright} 
-      />
-
-      <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
+      <div className="my-auto max-w-lg w-full mx-auto py-8">
         
-        <div className="mb-4"></div>
-
-        <div className="my-auto max-w-lg w-full mx-auto">
+        <div className="text-center mb-5">
+          <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
+          <p className="text-xs text-slate-400 font-medium">{t.step3.stepInfo}</p>
           
-          <div className="text-center mb-5">
-            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
-            <p className="text-xs text-slate-400 font-medium">{t.step3.stepInfo}</p>
-            
-            <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
-            </div>
-
-            <p className="text-[11px] text-slate-400 mt-2.5">
-              {t.common.optionalNotice}
-            </p>
+          <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
+          <p className="text-[11px] text-slate-400 mt-2.5">
+            {t.common.optionalNotice}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
+          
+          {errorMsg && (
+            <div className="mb-4 bg-[#FDF2F2] border border-[#FAD2D2] rounded-xl p-3 flex items-center gap-2 text-[#DC2626]">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <p className="text-xs font-medium leading-relaxed">
+                {errorMsg}
+              </p>
+            </div>
+          )}
+
+          <form onSubmit={handleContinue}>
             
-            {errorMsg && (
-              <div className="mb-4 bg-[#FDF2F2] border border-[#FAD2D2] rounded-xl p-3 flex items-center gap-2 text-[#DC2626]">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <p className="text-xs font-medium leading-relaxed">
-                  {errorMsg}
-                </p>
+            <div className="mb-6">
+              <label className="block text-xs font-bold text-slate-700 mb-3 text-left">
+                {t.step3.platformLabel}
+              </label>
+
+              <div className="grid grid-cols-4 gap-2.5 mb-3">
+                {PLATFORMS.map((platform) => {
+                  const isSelected = selectedPlatforms.includes(platform.id);
+                  return (
+                    <button
+                      type="button"
+                      key={platform.id}
+                      onClick={() => togglePlatform(platform.id)}
+                      className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border transition-all duration-150 cursor-pointer ${
+                        isSelected
+                          ? 'border-indigo-600 bg-indigo-50/70 shadow-sm ring-1 ring-indigo-500 text-indigo-700'
+                          : 'border-slate-100 bg-white hover:bg-slate-50 hover:border-slate-200 shadow-sm text-slate-600'
+                      }`}
+                    >
+                      <div className="w-8 h-8 flex items-center justify-center mb-2">
+                        {platform.icon}
+                      </div>
+                      <span className={`text-[11px] font-medium ${isSelected ? 'text-indigo-700' : 'text-slate-700'}`}>
+                        {platform.name}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-            )}
 
-            <form onSubmit={handleContinue}>
-              
-              <div className="mb-6">
-                <label className="block text-xs font-bold text-slate-700 mb-3 text-left">
-                  {t.step3.platformLabel}
-                </label>
+              <p className="text-[11px] text-slate-400 mb-5 text-left">
+                {t.step3.platformHint}
+              </p>
 
-                <div className="grid grid-cols-4 gap-2.5 mb-3">
-                  {PLATFORMS.map((platform) => {
-                    const isSelected = selectedPlatforms.includes(platform.id);
-                    return (
-                      <button
-                        type="button"
-                        key={platform.id}
-                        onClick={() => togglePlatform(platform.id)}
-                        className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border transition-all duration-150 cursor-pointer ${
-                          isSelected
-                            ? 'border-indigo-600 bg-indigo-50/70 shadow-sm ring-1 ring-indigo-500 text-indigo-700'
-                            : 'border-slate-100 bg-white hover:bg-slate-50 hover:border-slate-200 shadow-sm text-slate-600'
-                        }`}
-                      >
-                        <div className="w-8 h-8 flex items-center justify-center mb-2">
-                          {platform.icon}
-                        </div>
-                        <span className={`text-[11px] font-medium ${isSelected ? 'text-indigo-700' : 'text-slate-700'}`}>
-                          {platform.name}
-                        </span>
-                      </button>
-                    );
-                  })}
+              {selectedPlatforms.length === 0 ? (
+                <div className="border border-dashed border-slate-200 rounded-2xl py-3.5 px-4 text-center bg-slate-50/40 flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 text-slate-400" />
+                  <span className="text-xs text-slate-400 font-normal">
+                    {t.step3.noPlatformText}
+                  </span>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  {selectedPlatforms.map((platformId) => {
+                    const platform = PLATFORMS.find((p) => p.id === platformId)!;
+                    const data = platformsData[platformId] || { url: '', followers: '', rateVideo: '', ratePhoto: '', rateLive: '' };
 
-                <p className="text-[11px] text-slate-400 mb-5 text-left">
-                  {t.step3.platformHint}
-                </p>
-
-                {selectedPlatforms.length === 0 ? (
-                  <div className="border border-dashed border-slate-200 rounded-2xl py-3.5 px-4 text-center bg-slate-50/40 flex items-center justify-center gap-2">
-                    <Users className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs text-slate-400 font-normal">
-                      {t.step3.noPlatformText}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {selectedPlatforms.map((platformId) => {
-                      const platform = PLATFORMS.find((p) => p.id === platformId)!;
-                      const data = platformsData[platformId] || { url: '', followers: '', rateVideo: '', ratePhoto: '', rateLive: '' };
-
-                      return (
-                        <div key={platformId} className="border border-slate-200 rounded-2xl p-4 bg-white shadow-sm transition-all">
-                          
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-6 h-6 flex items-center justify-center">{platform.icon}</div>
-                              <span className="font-bold text-sm text-slate-800">{platform.name}</span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => togglePlatform(platformId)}
-                              className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                    return (
+                      <div key={platformId} className="border border-slate-200 rounded-2xl p-4 bg-white shadow-sm transition-all">
+                        
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-6 h-6 flex items-center justify-center">{platform.icon}</div>
+                            <span className="font-bold text-sm text-slate-800">{platform.name}</span>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => togglePlatform(platformId)}
+                            className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                            <div>
-                              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.profileUrlLabel}</label>
-                              <div className="relative flex items-center">
-                                <span className="absolute left-3.5 text-slate-400 font-medium text-sm">@</span>
-                                <input
-                                  type="text"
-                                  placeholder={t.step3.profileUrlPlaceholder}
-                                  value={data.url}
-                                  onChange={(e) => handleDataChange(platformId, 'url', e.target.value)}
-                                  className="w-full pl-8 pr-3 py-2 text-xs bg-white rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
-                                />
-                              </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.profileUrlLabel}</label>
+                            <div className="relative flex items-center">
+                              <span className="absolute left-3.5 text-slate-400 font-medium text-sm">@</span>
+                              <input
+                                type="text"
+                                placeholder={t.step3.profileUrlPlaceholder}
+                                value={data.url}
+                                onChange={(e) => handleDataChange(platformId, 'url', e.target.value)}
+                                className="w-full pl-8 pr-3 py-2 text-xs bg-white rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                              />
                             </div>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.followersLabel}</label>
+                            <div className="relative flex items-center">
+                              <Users className="absolute left-3.5 w-3.5 h-3.5 text-slate-400" />
+                              <input
+                                type="number"
+                                placeholder="0"
+                                value={data.followers}
+                                onChange={(e) => handleDataChange(platformId, 'followers', e.target.value)}
+                                className="w-full pl-9 pr-3 py-2 text-xs bg-white rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
+                          <div className="flex items-baseline gap-2 mb-3">
+                            <span className="text-xs font-bold text-slate-800">{t.step3.rateCardTitle}</span>
+                            <span className="text-[10px] text-slate-400">{t.step3.rateCardSubtitle}</span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.followersLabel}</label>
+                              <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateVideo}</label>
                               <div className="relative flex items-center">
-                                <Users className="absolute left-3.5 w-3.5 h-3.5 text-slate-400" />
+                                <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
                                 <input
                                   type="number"
                                   placeholder="0"
-                                  value={data.followers}
-                                  onChange={(e) => handleDataChange(platformId, 'followers', e.target.value)}
-                                  className="w-full pl-9 pr-3 py-2 text-xs bg-white rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                                  value={data.rateVideo}
+                                  onChange={(e) => handleDataChange(platformId, 'rateVideo', e.target.value)}
+                                  className="w-full pl-7 pr-2 py-1.5 text-xs bg-white rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.ratePhoto}</label>
+                              <div className="relative flex items-center">
+                                <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
+                                <input
+                                  type="number"
+                                  placeholder="0"
+                                  value={data.ratePhoto}
+                                  onChange={(e) => handleDataChange(platformId, 'ratePhoto', e.target.value)}
+                                  className="w-full pl-7 pr-2 py-1.5 text-xs bg-white rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateLive}</label>
+                              <div className="relative flex items-center">
+                                <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
+                                <input
+                                  type="number"
+                                  placeholder="0"
+                                  value={data.rateLive}
+                                  onChange={(e) => handleDataChange(platformId, 'rateLive', e.target.value)}
+                                  className="w-full pl-7 pr-2 py-1.5 text-xs bg-white rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
                                 />
                               </div>
                             </div>
                           </div>
-
-                          <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
-                            <div className="flex items-baseline gap-2 mb-3">
-                              <span className="text-xs font-bold text-slate-800">{t.step3.rateCardTitle}</span>
-                              <span className="text-[10px] text-slate-400">{t.step3.rateCardSubtitle}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-2">
-                              <div>
-                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateVideo}</label>
-                                <div className="relative flex items-center">
-                                  <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
-                                  <input
-                                    type="number"
-                                    placeholder="0"
-                                    value={data.rateVideo}
-                                    onChange={(e) => handleDataChange(platformId, 'rateVideo', e.target.value)}
-                                    className="w-full pl-7 pr-2 py-1.5 text-xs bg-white rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.ratePhoto}</label>
-                                <div className="relative flex items-center">
-                                  <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
-                                  <input
-                                    type="number"
-                                    placeholder="0"
-                                    value={data.ratePhoto}
-                                    onChange={(e) => handleDataChange(platformId, 'ratePhoto', e.target.value)}
-                                    className="w-full pl-7 pr-2 py-1.5 text-xs bg-white rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateLive}</label>
-                                <div className="relative flex items-center">
-                                  <span className="absolute left-3 text-slate-400 font-medium text-xs">฿</span>
-                                  <input
-                                    type="number"
-                                    placeholder="0"
-                                    value={data.rateLive}
-                                    onChange={(e) => handleDataChange(platformId, 'rateLive', e.target.value)}
-                                    className="w-full pl-7 pr-2 py-1.5 text-xs bg-white rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
 
-              <div className="flex items-center justify-between gap-2.5 pt-4 border-t border-slate-100">
-                <div className="flex items-center gap-2">
-                  {/* ปุ่ม Back ส่งข้อมูลปัจจุบันกลับไปบันทึก */}
-                  <button
-                    type="button"
-                    onClick={() => onBack({ selectedPlatforms, platformsData })}
-                    className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
-                  >
-                    {t.common.backBtn}
-                  </button>
-                  {/* ปุ่ม Skip ส่งข้อมูลปัจจุบันกลับไปบันทึกเช่นกัน */}
-                  <button
-                    type="button"
-                    onClick={() => onSkip({ selectedPlatforms, platformsData })}
-                    className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
-                  >
-                    {t.common.skipBtn}
-                  </button>
+                      </div>
+                    );
+                  })}
                 </div>
+              )}
+            </div>
 
+            <div className="flex items-center justify-between gap-2.5 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-2">
                 <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center gap-1.5 cursor-pointer"
+                  type="button"
+                  onClick={() => onBack({ selectedPlatforms, platformsData })}
+                  className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                 >
-                  <span>{t.common.submitBtn}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {t.common.backBtn}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSkip({ selectedPlatforms, platformsData })}
+                  className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
+                >
+                  {t.common.skipBtn}
                 </button>
               </div>
 
-            </form>
-
-            <div className="mt-6 pt-2 text-center text-xs text-slate-500">
-              <span>{t.common.hasAccount} </span>
               <button
-                type="button"
-                onClick={onNavigateToLogin}
-                className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
+                type="submit"
+                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center gap-1.5 cursor-pointer"
               >
-                {t.common.loginLink}
+                <span>{t.common.submitBtn}</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
+          </form>
+
+          <div className="mt-6 pt-2 text-center text-xs text-slate-500">
+            <span>{t.common.hasAccount} </span>
+            <button
+              type="button"
+              onClick={onNavigateToLogin}
+              className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
+            >
+              {t.common.loginLink}
+            </button>
           </div>
+
         </div>
 
-        <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
-          <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
-          <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>
-          <a href="#help" className="hover:text-slate-600">{t.common.help}</a>
-        </div>
+        
 
       </div>
 

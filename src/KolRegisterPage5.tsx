@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Landmark, User, CreditCard, ChevronDown } from 'lucide-react';
-import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
 
 interface KolRegisterPage5Props {
@@ -171,176 +170,159 @@ export default function KolRegisterPage5({
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
+    /* ปรับคลาสหลักให้ใช้ w-full h-screen lg:h-full พร้อม snap-start และ overflow-y-auto เพื่อจัดกึ่งกลางและเลื่อนได้พอดีในฝั่งขวา */
+    <div className="w-full h-screen lg:h-full snap-start lg:snap-none flex flex-col justify-center items-center p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative overflow-y-auto">
       
-      {/* ฝั่งซ้าย: Hero Section */}
-      <HeroSection 
-        heroTag={t.common.heroTag} 
-        heroSubtitle={t.common.heroSubtitle} 
-        footerCopyright={t.common.footerCopyright} 
-      />
-
-      {/* ฝั่งขวา: Form Content */}
-      <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
+      {/* Card Form */}
+      <div className="my-auto max-w-lg w-full mx-auto py-8">
         
-        <div className="mb-4"></div>
-
-        {/* Card Form */}
-        <div className="my-auto max-w-lg w-full mx-auto">
+        <div className="text-center mb-5">
+          <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
+          <p className="text-xs text-slate-400 font-medium">{t.step5.stepInfo}</p>
           
-          <div className="text-center mb-5">
-            <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
-            <p className="text-xs text-slate-400 font-medium">{t.step5.stepInfo}</p>
-            
-            {/* Stepper Bar (Active 5 ช่อง) */}
-            <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
-              <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
-            </div>
-
-            <p className="text-[11px] text-slate-400 mt-2.5">
-              {t.common.optionalNotice}
-            </p>
+          {/* Stepper Bar (Active 5 ช่อง) */}
+          <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
+            <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
-            <form onSubmit={handleContinue} noValidate>
+          <p className="text-[11px] text-slate-400 mt-2.5">
+            {t.common.optionalNotice}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
+          <form onSubmit={handleContinue} noValidate>
+            
+            <div className="space-y-4 mb-8">
               
-              <div className="space-y-4 mb-8">
-                
-                {/* ธนาคาร (Select) */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.bankLabel}</label>
-                  <div className="relative flex items-center">
-                    <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
-                    <select
-                      name="bank"
-                      value={formData.bank}
-                      onChange={handleChange}
-                      className={`${getInputClassName('bank', true)} ${formData.bank ? 'text-slate-800' : 'text-slate-400'}`}
-                    >
-                      <option value="" disabled hidden>{t.step5.bankPlaceholder}</option>
-                      {bankKeys.map((key) => (
-                        <option key={key} value={key} className="text-slate-800">
-                          {t.step5.banks[key as keyof typeof t.step5.banks]}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-2.5 pointer-events-none" />
-                  </div>
-                  {errors.bank && <p className="text-[11px] text-rose-500 mt-1">{errors.bank}</p>}
+              {/* ธนาคาร (Select) */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.bankLabel}</label>
+                <div className="relative flex items-center">
+                  <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <select
+                    name="bank"
+                    value={formData.bank}
+                    onChange={handleChange}
+                    className={`${getInputClassName('bank', true)} ${formData.bank ? 'text-slate-800' : 'text-slate-400'}`}
+                  >
+                    <option value="" disabled hidden>{t.step5.bankPlaceholder}</option>
+                    {bankKeys.map((key) => (
+                      <option key={key} value={key} className="text-slate-800">
+                        {t.step5.banks[key as keyof typeof t.step5.banks]}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-2.5 pointer-events-none" />
                 </div>
-
-                {/* แสดงช่องกรอกเพิ่มเติมถ้าเลือก "อื่นๆ" */}
-                {formData.bank === 'other' && (
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.otherBankPlaceholder}</label>
-                    <div className="relative flex items-center">
-                      <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
-                      <input
-                        type="text"
-                        name="otherBank"
-                        placeholder={t.step5.otherBankPlaceholder}
-                        value={formData.otherBank}
-                        onChange={handleChange}
-                        className={getInputClassName('otherBank')}
-                      />
-                    </div>
-                    {errors.otherBank && <p className="text-[11px] text-rose-500 mt-1">{errors.otherBank}</p>}
-                  </div>
-                )}
-
-                {/* ชื่อบัญชี */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.accountNameLabel}</label>
-                  <div className="relative flex items-center">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
-                    <input
-                      type="text"
-                      name="accountName"
-                      placeholder={t.step5.accountNamePlaceholder}
-                      value={formData.accountName}
-                      onChange={handleChange}
-                      className={getInputClassName('accountName')}
-                    />
-                  </div>
-                  {errors.accountName && <p className="text-[11px] text-rose-500 mt-1">{errors.accountName}</p>}
-                </div>
-
-                {/* เลขที่บัญชี */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.accountNumberLabel}</label>
-                  <div className="relative flex items-center">
-                    <CreditCard className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
-                    <input
-                      type="text"
-                      name="accountNumber"
-                      maxLength={15}
-                      placeholder={t.step5.accountNumberPlaceholder}
-                      value={formData.accountNumber}
-                      onChange={handleChange}
-                      className={getInputClassName('accountNumber')}
-                    />
-                  </div>
-                  {errors.accountNumber && <p className="text-[11px] text-rose-500 mt-1">{errors.accountNumber}</p>}
-                </div>
-
+                {errors.bank && <p className="text-[11px] text-rose-500 mt-1">{errors.bank}</p>}
               </div>
 
-              {/* Action Buttons: ส่ง formData กลับไปตอนกด Back และ Skip */}
-              <div className="flex items-center justify-between gap-2.5 pt-2">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onBack(formData)}
-                    className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
-                  >
-                    {t.common.backBtn}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onSkip(formData)}
-                    className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
-                  >
-                    {t.common.skipBtn}
-                  </button>
+              {/* แสดงช่องกรอกเพิ่มเติมถ้าเลือก "อื่นๆ" */}
+              {formData.bank === 'other' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.otherBankPlaceholder}</label>
+                  <div className="relative flex items-center">
+                    <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                    <input
+                      type="text"
+                      name="otherBank"
+                      placeholder={t.step5.otherBankPlaceholder}
+                      value={formData.otherBank}
+                      onChange={handleChange}
+                      className={getInputClassName('otherBank')}
+                    />
+                  </div>
+                  {errors.otherBank && <p className="text-[11px] text-rose-500 mt-1">{errors.otherBank}</p>}
                 </div>
+              )}
 
+              {/* ชื่อบัญชี */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.accountNameLabel}</label>
+                <div className="relative flex items-center">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <input
+                    type="text"
+                    name="accountName"
+                    placeholder={t.step5.accountNamePlaceholder}
+                    value={formData.accountName}
+                    onChange={handleChange}
+                    className={getInputClassName('accountName')}
+                  />
+                </div>
+                {errors.accountName && <p className="text-[11px] text-rose-500 mt-1">{errors.accountName}</p>}
+              </div>
+
+              {/* เลขที่บัญชี */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step5.accountNumberLabel}</label>
+                <div className="relative flex items-center">
+                  <CreditCard className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+                  <input
+                    type="text"
+                    name="accountNumber"
+                    maxLength={15}
+                    placeholder={t.step5.accountNumberPlaceholder}
+                    value={formData.accountNumber}
+                    onChange={handleChange}
+                    className={getInputClassName('accountNumber')}
+                  />
+                </div>
+                {errors.accountNumber && <p className="text-[11px] text-rose-500 mt-1">{errors.accountNumber}</p>}
+              </div>
+
+            </div>
+
+            {/* Action Buttons: ส่ง formData กลับไปตอนกด Back และ Skip */}
+            <div className="flex items-center justify-between gap-2.5 pt-2">
+              <div className="flex items-center gap-2">
                 <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center gap-1.5 cursor-pointer"
+                  type="button"
+                  onClick={() => onBack(formData)}
+                  className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                 >
-                  <span>{t.common.submitBtn}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {t.common.backBtn}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSkip(formData)}
+                  className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
+                >
+                  {t.common.skipBtn}
                 </button>
               </div>
 
-            </form>
-
-            <div className="mt-8 pt-2 text-center text-xs text-slate-500 border-t border-slate-50">
-              <span>{t.common.hasAccount} </span>
               <button
-                type="button"
-                onClick={onNavigateToLogin}
-                className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
+                type="submit"
+                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center gap-1.5 cursor-pointer"
               >
-                {t.common.loginLink}
+                <span>{t.common.submitBtn}</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
+          </form>
+
+          <div className="mt-8 pt-2 text-center text-xs text-slate-500 border-t border-slate-50">
+            <span>{t.common.hasAccount} </span>
+            <button
+              type="button"
+              onClick={onNavigateToLogin}
+              className="text-indigo-600 font-bold hover:underline bg-transparent border-none cursor-pointer"
+            >
+              {t.common.loginLink}
+            </button>
           </div>
+
         </div>
 
-        {/* Footer Navigation */}
-        <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
-          <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
-          <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>
-          <a href="#help" className="hover:text-slate-600">{t.common.help}</a>
-        </div>
+        
 
       </div>
 
