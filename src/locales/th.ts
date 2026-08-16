@@ -50,6 +50,7 @@ export const th = {
     rateVideo: 'วิดีโอ',
     ratePhoto: 'ภาพ',
     rateLive: 'ไลฟ์',
+    validationError: "กรอก URL หรือชื่อผู้ใช้สำหรับทุกแพลตฟอร์ม",
   },
   step4: {
   stepInfo: 'ขั้นตอนที่ 4 จาก 6 · ที่อยู่',

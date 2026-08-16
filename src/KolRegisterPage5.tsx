@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Landmark, User, CreditCard, ChevronDown } from 'lucide-react';
 import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
@@ -10,8 +10,8 @@ interface KolRegisterPage5Props {
     accountName: string;
     accountNumber: string;
   };
-  onBack: () => void;
-  onSkip: () => void;
+  onBack: (data: any) => void;
+  onSkip: (data: any) => void;
   onNext: (paymentData: any) => void;
   onNavigateToLogin: () => void;
 }
@@ -25,7 +25,6 @@ export default function KolRegisterPage5({
 }: KolRegisterPage5Props) {
   const { t } = useLanguage();
   
-  // นำ initialData มาใส่เป็นค่าเริ่มต้น (ถ้ามี)
   const [formData, setFormData] = useState({
     bank: initialData?.bank || '',
     otherBank: initialData?.otherBank || '',
@@ -35,6 +34,18 @@ export default function KolRegisterPage5({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // คอยอัปเดต State ทันทีเมื่อ initialData มีการเปลี่ยนแปลง (ตอนกดปุ่ม Back กลับมา)
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        bank: initialData.bank || '',
+        otherBank: initialData.otherBank || '',
+        accountName: initialData.accountName || '',
+        accountNumber: initialData.accountNumber || ''
+      });
+    }
+  }, [initialData]);
 
   const validateField = (name: string, value: string, currentData = formData) => {
     let errorMsg = '';
@@ -72,7 +83,6 @@ export default function KolRegisterPage5({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // กรองเฉพาะตัวเลขสำหรับเลขที่บัญชี
     let processedValue = value;
     if (name === 'accountNumber') {
       processedValue = value.replace(/\D/g, '').slice(0, 15);
@@ -93,7 +103,6 @@ export default function KolRegisterPage5({
       return newErrors;
     });
 
-    // หากเปลี่ยนจาก "อื่นๆ" เป็นธนาคารอื่น ให้เคลียร์ error ของช่อง otherBank ออก
     if (name === 'bank' && value !== 'other') {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -143,7 +152,6 @@ export default function KolRegisterPage5({
     return `${baseClass} border-slate-200 focus:ring-indigo-200 ${isSelect ? 'bg-slate-50/70' : ''}`;
   };
 
-  // รายชื่อธนาคารอ้างอิงคีย์จากไฟล์ภาษา
   const bankKeys = [
     'bangkok',
     'kasikorn',
@@ -283,19 +291,19 @@ export default function KolRegisterPage5({
 
               </div>
 
-              {/* Action Buttons: ย้อนกลับ, ข้าม, ดำเนินการต่อ */}
+              {/* Action Buttons: ส่ง formData กลับไปตอนกด Back และ Skip */}
               <div className="flex items-center justify-between gap-2.5 pt-2">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={onBack}
+                    onClick={() => onBack(formData)}
                     className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                   >
                     {t.common.backBtn}
                   </button>
                   <button
                     type="button"
-                    onClick={onSkip}
+                    onClick={() => onSkip(formData)}
                     className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
                   >
                     {t.common.skipBtn}

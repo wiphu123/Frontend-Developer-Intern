@@ -199,7 +199,7 @@ export default function RegisterPage() {
                 <div>
                   <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.firstNameLabel}</label>
                   <div className="relative flex items-center">
-                    <User className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <User className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type="text"
                       name="firstName"
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                 <div>
                   <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.lastNameLabel}</label>
                   <div className="relative flex items-center">
-                    <User className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <User className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type="text"
                       name="lastName"
@@ -233,7 +233,7 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.emailLabel}</label>
                 <div className="relative flex items-center">
-                  <Mail className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Mail className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-3.5 pointer-events-none" />
                   <input
                     type="email"
                     name="email"
@@ -250,7 +250,7 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.positionLabel}</label>
                 <div className="relative flex items-center">
-                  <Briefcase className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Briefcase className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-3.5 pointer-events-none" />
                   <select
                     name="position"
                     value={formData.position}
@@ -263,7 +263,7 @@ export default function RegisterPage() {
                     <option value="director" className="text-gray-800">{t.register.posDirector}</option>
                     <option value="accounting" className="text-gray-800">{t.register.posAccounting}</option>
                   </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-[10px]">▼</div>
+                  <div className="absolute right-4 top-3.5 text-gray-400 text-[10px]">▼</div>
                 </div>
                 {errors.position && <p className="text-[11px] text-rose-500 mt-1">{errors.position}</p>}
               </div>
@@ -272,7 +272,7 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.passwordLabel}</label>
                 <div className="relative flex items-center">
-                  <Lock className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-3.5 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
@@ -285,9 +285,9 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
                   >
-                    {showPassword ? <Eye className="w-[18px] h-[18px]" /> : <EyeOff className="w-[18px] h-[18px]" />}
+                    {showPassword ? <Eye className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-400 mt-1.5">{t.register.passwordHint}</p>
@@ -298,7 +298,7 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{t.register.confirmPasswordLabel}</label>
                 <div className="relative flex items-center">
-                  <Lock className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-[18px] h-[18px] text-gray-400 absolute left-3.5 top-3.5  pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="confirmPassword"

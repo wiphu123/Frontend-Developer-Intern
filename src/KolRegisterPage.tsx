@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Phone, AtSign, ArrowRight } from 'lucide-react';
 import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
@@ -26,6 +26,18 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // **เพิ่ม useEffect ตรงนี้** เพื่อดึงข้อมูลเดิมกลับมาแสดงเมื่อผู้ใช้กดปุ่มย้อนกลับ (Back)
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        firstName: initialData.firstName || '',
+        lastName: initialData.lastName || '',
+        phone: initialData.phone || '',
+        lineId: initialData.lineId || '',
+      });
+    }
+  }, [initialData]);
 
   const validateField = (name: string, value: string) => {
     let errorMsg = '';
@@ -58,7 +70,6 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // ถ้าเป็นช่องเบอร์โทรศัพท์ ให้กรองรับเฉพาะตัวเลขเท่านั้น และจำกัดไม่เกิน 10 หลัก
     let processedValue = value;
     if (name === 'phone') {
       processedValue = value.replace(/\D/g, '').slice(0, 10);
@@ -115,26 +126,22 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
       
-      {/* ฝั่งซ้าย */}
       <HeroSection 
         heroTag={t.common.heroTag} 
         heroSubtitle={t.common.heroSubtitle} 
         footerCopyright={t.common.footerCopyright} 
       />
 
-      {/* ฝั่งขวา: Form Content */}
       <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
         
         <div className="mb-4"></div>
 
-        {/* Card Form Wrapper */}
         <div className="my-auto max-w-lg w-full mx-auto">
           
           <div className="text-center mb-5">
             <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
             <p className="text-xs text-slate-400 font-medium">{t.step1.stepInfo}</p>
             
-            {/* Stepper Bar 6 ขั้นตอน */}
             <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
               <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
               <div className="h-1 flex-1 bg-indigo-200/60 rounded-full"></div>
@@ -149,18 +156,16 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
             </p>
           </div>
 
-          {/* White Card Form */}
           <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
             <form onSubmit={handleContinue} noValidate>
               
               <div className="space-y-4">
                 
-                {/* ชื่อ - นามสกุล */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step1.firstNameLabel}</label>
                     <div className="relative flex items-center">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                       <input
                         type="text"
                         name="firstName"
@@ -176,7 +181,7 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step1.lastNameLabel}</label>
                     <div className="relative flex items-center">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                       <input
                         type="text"
                         name="lastName"
@@ -190,11 +195,10 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
                   </div>
                 </div>
 
-                {/* เบอร์โทรศัพท์ (กรอกได้เฉพาะตัวเลข) */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step1.phoneLabel}</label>
                   <div className="relative flex items-center">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type="tel"
                       name="phone"
@@ -208,11 +212,10 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
                   {errors.phone && <p className="text-[11px] text-rose-500 mt-1">{errors.phone}</p>}
                 </div>
 
-                {/* Line ID */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step1.lineIdLabel}</label>
                   <div className="relative flex items-center">
-                    <AtSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <AtSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type="text"
                       name="lineId"
@@ -224,7 +227,6 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
                   </div>
                 </div>
 
-                {/* ปุ่มดำเนินการต่อ */}
                 <button
                   type="submit"
                   className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center justify-center gap-2 mt-5 cursor-pointer"
@@ -236,7 +238,6 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
               </div>
             </form>
 
-            {/* กลับหน้าเข้าสู่ระบบ */}
             <div className="mt-8 pt-2 text-center text-xs text-slate-500 border-t border-slate-50">
               <span>{t.common.hasAccount} </span>
               <button
@@ -251,7 +252,6 @@ export default function KolRegisterPage({ initialData, onNext, onNavigateToLogin
           </div>
         </div>
 
-        {/* Footer Navigation */}
         <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
           <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
           <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>

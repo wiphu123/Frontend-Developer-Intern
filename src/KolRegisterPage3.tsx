@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowRight, Users, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Users, Trash2, AlertCircle } from 'lucide-react';
 import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
 
@@ -8,8 +8,8 @@ interface KolRegisterPage3Props {
     selectedPlatforms?: string[];
     platformsData?: Record<string, PlatformData>;
   };
-  onBack: () => void;
-  onSkip: () => void;
+  onBack: (data: { selectedPlatforms: string[]; platformsData: Record<string, PlatformData> }) => void;
+  onSkip: (data: { selectedPlatforms: string[]; platformsData: Record<string, PlatformData> }) => void;
   onNext: (selectedPlatforms: string[], platformsData: Record<string, PlatformData>) => void;
   onNavigateToLogin: () => void;
 }
@@ -93,11 +93,18 @@ export default function KolRegisterPage3({
 }: KolRegisterPage3Props) {
   const { t } = useLanguage();
   
-  // นำค่า initialData มาใส่เป็นค่าเริ่มต้น (ถ้ามี)
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(initialData?.selectedPlatforms || []);
   const [platformsData, setPlatformsData] = useState<Record<string, PlatformData>>(initialData?.platformsData || {});
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // สลับเปิด/ปิด แพลตฟอร์ม
+  // คอยอัปเดต State ทันทีเมื่อ initialData มีการเปลี่ยนแปลง (เช่น ตอนกดปุ่ม Back กลับมา)
+  useEffect(() => {
+    if (initialData) {
+      setSelectedPlatforms(initialData.selectedPlatforms || []);
+      setPlatformsData(initialData.platformsData || {});
+    }
+  }, [initialData]);
+
   const togglePlatform = (id: string) => {
     setSelectedPlatforms((prev) => {
       if (prev.includes(id)) {
@@ -113,6 +120,7 @@ export default function KolRegisterPage3({
         return [...prev, id];
       }
     });
+    if (errorMsg) setErrorMsg('');
   };
 
   const handleDataChange = (platformId: string, field: keyof PlatformData, value: string) => {
@@ -123,10 +131,21 @@ export default function KolRegisterPage3({
         [field]: value
       }
     }));
+    if (errorMsg) setErrorMsg('');
   };
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
+
+    for (const platformId of selectedPlatforms) {
+      const data = platformsData[platformId];
+      if (!data || !data.url.trim() || !data.followers.trim()) {
+        setErrorMsg(t.step3.validationError || 'กรอก URL หรือชื่อผู้ใช้สำหรับทุกแพลตฟอร์ม');
+        return;
+      }
+    }
+
+    setErrorMsg('');
     if (onNext) {
       onNext(selectedPlatforms, platformsData);
     }
@@ -135,26 +154,22 @@ export default function KolRegisterPage3({
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F3F0FF] text-slate-800 font-['Prompt'] relative">
       
-      {/* ฝั่งซ้าย */}
       <HeroSection 
         heroTag={t.common.heroTag} 
         heroSubtitle={t.common.heroSubtitle} 
         footerCopyright={t.common.footerCopyright} 
       />
 
-      {/* ฝั่งขวา: Form Content */}
       <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
         
         <div className="mb-4"></div>
 
-        {/* Card Form */}
         <div className="my-auto max-w-lg w-full mx-auto">
           
           <div className="text-center mb-5">
             <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
             <p className="text-xs text-slate-400 font-medium">{t.step3.stepInfo}</p>
             
-            {/* Stepper Bar (Active 3 ช่องแรก) */}
             <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
               <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
               <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
@@ -170,6 +185,16 @@ export default function KolRegisterPage3({
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/40 p-6 sm:p-8 border border-slate-100/80">
+            
+            {errorMsg && (
+              <div className="mb-4 bg-[#FDF2F2] border border-[#FAD2D2] rounded-xl p-3 flex items-center gap-2 text-[#DC2626]">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <p className="text-xs font-medium leading-relaxed">
+                  {errorMsg}
+                </p>
+              </div>
+            )}
+
             <form onSubmit={handleContinue}>
               
               <div className="mb-6">
@@ -177,7 +202,6 @@ export default function KolRegisterPage3({
                   {t.step3.platformLabel}
                 </label>
 
-                {/* 1. แผงปุ่มเลือก Platform */}
                 <div className="grid grid-cols-4 gap-2.5 mb-3">
                   {PLATFORMS.map((platform) => {
                     const isSelected = selectedPlatforms.includes(platform.id);
@@ -207,7 +231,6 @@ export default function KolRegisterPage3({
                   {t.step3.platformHint}
                 </p>
 
-                {/* 2. แสดงฟอร์มย่อยเมื่อมีการเลือก Platform */}
                 {selectedPlatforms.length === 0 ? (
                   <div className="border border-dashed border-slate-200 rounded-2xl py-3.5 px-4 text-center bg-slate-50/40 flex items-center justify-center gap-2">
                     <Users className="w-4 h-4 text-slate-400" />
@@ -224,7 +247,6 @@ export default function KolRegisterPage3({
                       return (
                         <div key={platformId} className="border border-slate-200 rounded-2xl p-4 bg-white shadow-sm transition-all">
                           
-                          {/* หัวการ์ดย่อย (ไอคอน + ชื่อ + ปุ่มลบ) */}
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2.5">
                               <div className="w-6 h-6 flex items-center justify-center">{platform.icon}</div>
@@ -239,7 +261,6 @@ export default function KolRegisterPage3({
                             </button>
                           </div>
 
-                          {/* อินพุต URL & ผู้ติดตาม */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                             <div>
                               <label className="block text-[11px] font-bold text-slate-700 mb-1.5">{t.step3.profileUrlLabel}</label>
@@ -269,14 +290,12 @@ export default function KolRegisterPage3({
                             </div>
                           </div>
 
-                          {/* ตารางค่าตอบแทน (Rate Card) */}
                           <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
                             <div className="flex items-baseline gap-2 mb-3">
                               <span className="text-xs font-bold text-slate-800">{t.step3.rateCardTitle}</span>
                               <span className="text-[10px] text-slate-400">{t.step3.rateCardSubtitle}</span>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                              {/* วิดีโอ */}
                               <div>
                                 <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateVideo}</label>
                                 <div className="relative flex items-center">
@@ -290,7 +309,6 @@ export default function KolRegisterPage3({
                                   />
                                 </div>
                               </div>
-                              {/* ภาพนิ่ง */}
                               <div>
                                 <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.ratePhoto}</label>
                                 <div className="relative flex items-center">
@@ -304,7 +322,6 @@ export default function KolRegisterPage3({
                                   />
                                 </div>
                               </div>
-                              {/* ไลฟ์สด */}
                               <div>
                                 <label className="block text-[10px] font-medium text-slate-600 mb-1">{t.step3.rateLive}</label>
                                 <div className="relative flex items-center">
@@ -328,19 +345,20 @@ export default function KolRegisterPage3({
                 )}
               </div>
 
-              {/* Action Buttons: ย้อนกลับ, ข้าม, ดำเนินการต่อ */}
               <div className="flex items-center justify-between gap-2.5 pt-4 border-t border-slate-100">
                 <div className="flex items-center gap-2">
+                  {/* ปุ่ม Back ส่งข้อมูลปัจจุบันกลับไปบันทึก */}
                   <button
                     type="button"
-                    onClick={onBack}
+                    onClick={() => onBack({ selectedPlatforms, platformsData })}
                     className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                   >
                     {t.common.backBtn}
                   </button>
+                  {/* ปุ่ม Skip ส่งข้อมูลปัจจุบันกลับไปบันทึกเช่นกัน */}
                   <button
                     type="button"
-                    onClick={onSkip}
+                    onClick={() => onSkip({ selectedPlatforms, platformsData })}
                     className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
                   >
                     {t.common.skipBtn}
@@ -372,7 +390,6 @@ export default function KolRegisterPage3({
           </div>
         </div>
 
-        {/* Footer Navigation */}
         <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6">
           <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
           <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>

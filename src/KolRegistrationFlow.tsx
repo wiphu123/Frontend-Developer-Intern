@@ -28,20 +28,27 @@ export default function KolRegistrationFlow() {
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Final submission (กรณีเผื่อมีการกด Next ในหน้าสุดท้าย)
       const finalPayload = { ...stepData };
       console.log('Registration Data:', finalPayload);
       navigate('/register-kol-success');
     }
   };
 
-  const handleBack = () => {
+  // ✅ แก้ไข: รับข้อมูล (data) มาบันทึกก่อนถอยกลับ
+  const handleBack = (data?: any) => {
+    if (data) {
+      setStepData((prev) => ({ ...prev, [`step${currentStep}`]: data }));
+    }
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const handleSkip = () => {
+  // ✅ แก้ไข: รับข้อมูล (data) มาบันทึกก่อนกดข้าม (Skip)
+  const handleSkip = (data?: any) => {
+    if (data) {
+      setStepData((prev) => ({ ...prev, [`step${currentStep}`]: data }));
+    }
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -57,29 +64,18 @@ export default function KolRegistrationFlow() {
     const completeData = { ...stepData, step6: finalData };
     setStepData(completeData);
 
-    // 1. ดึงข้อมูลผู้ใช้เก่าที่มีอยู่ออกมาจาก localStorage (ใช้คีย์ 'allUsers' ร่วมกัน)
     const existingUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-
-    // 2. สร้างโครงสร้างข้อมูลใหม่ที่เก็บอีเมลและรหัสผ่านจากขั้นตอนสุดท้ายของ KOL
     const newUser = {
       email: finalData.email,
       password: finalData.password,
     };
 
-    // 3. นำข้อมูลใหม่เพิ่มต่อท้ายเข้าไปในอาเรย์
     existingUsers.push(newUser);
-
-    // 4. บันทึกข้อมูลทั้งหมดกลับลงไปใน localStorage
     localStorage.setItem('allUsers', JSON.stringify(existingUsers));
 
-    console.log('All Users Saved (KOL):', existingUsers);
-    console.log('All Registration Steps Data:', completeData);
-
-    // 5. เปลี่ยนเส้นทางไปหน้าสำเร็จของ KOL
     navigate('/register-kol-success');
   };
 
-  // Render the appropriate step component พร้อมส่งข้อมูลเดิม (initialData) กลับไปแสดงผล
   const renderStep = () => {
     switch (currentStep) {
       case 1:

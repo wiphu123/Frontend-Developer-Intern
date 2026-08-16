@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react';
 import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
@@ -8,7 +8,7 @@ interface KolRegisterPage6Props {
     email: string;
     password?: string;
   };
-  onBack: () => void;
+  onBack: (data: any) => void;
   onSubmit: (credentials: { email: string; password: string }) => void;
   onNavigateToLogin: () => void;
 }
@@ -24,12 +24,24 @@ export default function KolRegisterPage6({
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: initialData?.email || '',
-    password: '',
-    confirmPassword: '',
+    password: initialData?.password || '',
+    confirmPassword: initialData?.password || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // คอยอัปเดต State ทันทีเมื่อ initialData มีการเปลี่ยนแปลง (ตอนกดปุ่ม Back กลับมา)
+  useEffect(() => {
+    if (initialData) {
+      setFormData((prev) => ({
+        ...prev,
+        email: initialData.email || prev.email,
+        password: initialData.password || prev.password,
+        confirmPassword: initialData.password || prev.confirmPassword,
+      }));
+    }
+  }, [initialData]);
 
   const validateField = (name: string, value: string, currentData = formData) => {
     let errorMsg = '';
@@ -81,7 +93,6 @@ export default function KolRegisterPage6({
       return newErrors;
     });
 
-    // ถ้าแก้รหัสผ่าน ให้ตรวจสอบ confirmPassword ซ้ำทันที
     if (name === 'password' && touched.confirmPassword) {
       const confirmError = validateField('confirmPassword', updatedFormData.confirmPassword, updatedFormData);
       setErrors((prev) => {
@@ -178,7 +189,7 @@ export default function KolRegisterPage6({
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step6.emailLabel}</label>
                   <div className="relative flex items-center">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type="email"
                       name="email"
@@ -195,7 +206,7 @@ export default function KolRegisterPage6({
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step6.passwordLabel}</label>
                   <div className="relative flex items-center">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="password"
@@ -208,7 +219,7 @@ export default function KolRegisterPage6({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                      className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                     >
                       {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
@@ -221,7 +232,7 @@ export default function KolRegisterPage6({
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.step6.confirmPasswordLabel}</label>
                   <div className="relative flex items-center">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="confirmPassword"
@@ -245,11 +256,11 @@ export default function KolRegisterPage6({
 
               </div>
 
-              {/* Action Buttons: ย้อนกลับ, ดำเนินการต่อ */}
+              {/* Action Buttons: ส่ง formData กลับไปตอนกด Back */}
               <div className="flex items-center justify-between gap-2.5 pt-2">
                 <button
                   type="button"
-                  onClick={onBack}
+                  onClick={() => onBack(formData)}
                   className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                 >
                   {t.common.backBtn}

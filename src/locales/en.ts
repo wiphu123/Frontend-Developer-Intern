@@ -48,6 +48,7 @@ export const en = {
     rateVideo: 'Video',
     ratePhoto: 'Photo',
     rateLive: 'Live',
+    validationError: "Please enter URL or username for all selected platforms",
   },
   step4: {
   stepInfo: 'Step 4 of 6 · Address',

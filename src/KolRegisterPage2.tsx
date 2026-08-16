@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import HeroSection from './HeroSection';
 import { useLanguage } from './contexts/LanguageContext';
 
 interface KolRegisterPage2Props {
   initialData?: string[];
-  onBack: () => void;
-  onSkip: () => void;
+  onBack: (data: string[]) => void;
+  onSkip: (data: string[]) => void;
   onNext: (selectedSkills: string[]) => void;
   onNavigateToLogin: () => void;
 }
@@ -20,8 +20,14 @@ export default function KolRegisterPage2({
 }: KolRegisterPage2Props) {
   const { t } = useLanguage();
   
-  // ใช้ initialData ถ้ามี ถ้าไม่มีให้เริ่มต้นด้วยอาเรย์ว่าง
   const [selectedSkills, setSelectedSkills] = useState<string[]>(initialData || []); 
+
+  // คอยอัปเดต State ทันทีเมื่อ initialData มีการเปลี่ยนแปลง (ตอนกดปุ่ม Back กลับมา)
+  useEffect(() => {
+    if (initialData) {
+      setSelectedSkills(initialData);
+    }
+  }, [initialData]);
 
   const toggleSkill = (skillKey: string) => {
     setSelectedSkills((prev) =>
@@ -49,7 +55,6 @@ export default function KolRegisterPage2({
       {/* ฝั่งขวา: Step 2 Form */}
       <div className="lg:w-1/2 w-full flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#F3F0FF] relative min-h-screen py-8">
         
-        {/* เว้นพื้นที่ด้านบนให้บาลานซ์ */}
         <div className="mb-4"></div>
 
         {/* Card Form */}
@@ -59,7 +64,7 @@ export default function KolRegisterPage2({
             <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 mb-1">{t.common.title}</h2>
             <p className="text-xs text-slate-400 font-medium">{t.step2.stepInfo}</p>
             
-            {/* Stepper Bar 6 ขีด (Active 2 ช่องแรก) */}
+            {/* Stepper Bar */}
             <div className="flex items-center justify-center gap-1.5 mt-3 max-w-xs mx-auto">
               <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
               <div className="h-1 flex-1 bg-indigo-600 rounded-full"></div>
@@ -115,16 +120,18 @@ export default function KolRegisterPage2({
               {/* ปุ่ม Action: ย้อนกลับ, ข้าม, ดำเนินการต่อ */}
               <div className="flex items-center justify-between gap-2.5 pt-2">
                 <div className="flex items-center gap-2">
+                  {/* ส่ง selectedSkills กลับไปบันทึกตอนกด Back */}
                   <button
                     type="button"
-                    onClick={onBack}
+                    onClick={() => onBack(selectedSkills)}
                     className="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
                   >
                     {t.common.backBtn}
                   </button>
+                  {/* ส่ง selectedSkills กลับไปบันทึกตอนกด Skip */}
                   <button
                     type="button"
-                    onClick={onSkip}
+                    onClick={() => onSkip(selectedSkills)}
                     className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-transparent rounded-xl transition cursor-pointer"
                   >
                     {t.common.skipBtn}
