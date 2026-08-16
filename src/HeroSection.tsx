@@ -35,7 +35,7 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
       <div className="my-auto flex flex-col items-start text-left z-10 w-full mx-auto lg:mx-0 py-8">
         
         {/* Card Visual Hero Graphic */}
-        <div className="relative w-[210px] sm:w-[230px] mx-auto lg:ml-[200px] lg:mr-auto">
+        <div className="relative w-[210px] sm:w-[230px] mx-auto lg:ml-[220px] lg:mr-auto">
           
           {/* ================= จุดที่ 3: หมอกรอบๆ รูปภาพ (Halo Glow) ================= */}
           <div 
@@ -45,7 +45,7 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
           
 
           {/* Main Image Frame */}
-          <div className="relative w-full h-[270px] sm:h-[290px] bg-white rounded-[26px] p-2 shadow-xl shadow-indigo-100/50 border border-slate-100/80">
+          <div className="relative w-[270px] h-[350px] bg-white rounded-[32px] p-1.5 shadow-2xl shadow-indigo-100/50 border border-slate-100/80 mx-auto">
             <div className="w-full h-full rounded-[20px] overflow-hidden">
               <img 
                 src={image} 
@@ -68,10 +68,10 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
           </div>
 
           {/* Floating Emojis */}
-          <div className="absolute -top-3 right-1 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float">✨</div>
-          <div className="absolute top-16 -left-7 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float delay-1">😍</div>
-          <div className="absolute -bottom-2 -left-7 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float delay-2">🔥</div>
-          <div className="absolute bottom-14 -right-9 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float delay-3">💜</div>
+          <div className="absolute -top-6 -right-8 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float">✨</div>
+          <div className="absolute top-16 -left-9 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float delay-1">😍</div>
+          <div className="absolute -bottom-2 -left-8 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float delay-2">🔥</div>
+          <div className="absolute bottom-14 -right-19 w-11 h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-xl border border-slate-50 animate-float delay-3">💜</div>
         </div>
 
         {/* บล็อกข้อความ */}
