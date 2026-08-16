@@ -26,13 +26,13 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
   };
 
   return (
-    <div className="w-full h-screen lg:h-full flex flex-col justify-between items-center lg:items-start p-6 sm:p-8 lg:p-16 bg-white relative overflow-y-auto lg:overflow-hidden">
+    <div className="w-full h-screen xl:h-full flex flex-col justify-between items-center xl:items-start p-6 sm:p-8 xl:p-16 bg-white relative overflow-y-auto xl:overflow-hidden">
       
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 bg-[radial-[#e0e7ff]_1px,transparent_1px] [background-size:20px_20px] opacity-40 pointer-events-none"></div>
 
       {/* หมอกฝั่งขวาบน */}
-      <div aria-hidden="true" className="hidden lg:block absolute -right-20 top-1/4 -translate-y-1/2 pointer-events-none z-0">
+      <div aria-hidden="true" className="hidden xl:block absolute -right-20 top-1/4 -translate-y-1/2 pointer-events-none z-0">
         <div className="w-[500px] h-[500px] rounded-full bg-purple-300/40 blur-[120px]"></div>
       </div>
 
@@ -43,10 +43,10 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
       </div>
 
       {/* Content Box */}
-      <div className="my-auto flex flex-col items-center lg:items-start text-center lg:text-left z-10 w-full max-w-md mx-auto lg:mx-0 py-2">
+      <div className="my-auto flex flex-col items-center xl:items-start text-center xl:text-left z-10 w-full max-w-md mx-auto xl:mx-0 py-2">
         
         {/* Card Visual Hero Graphic */}
-        <div className="relative w-[240px] sm:w-[300px] mx-auto lg:ml-[100px] mb-6 sm:mb-10">
+        <div className="relative w-[240px] sm:w-[300px] mx-auto xl:ml-[100px] mb-6 sm:mb-10">
           
           <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] sm:w-[450px] sm:h-[450px] bg-gradient-to-tr from-purple-300/45 via-indigo-200/40 to-fuchsia-200/30 blur-[80px] rounded-full pointer-events-none -z-10"></div>
           
@@ -77,17 +77,17 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
         </div>
 
         {/* บล็อกข้อความ */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full z-10 relative">
+        <div className="flex flex-col items-center xl:items-start text-center xl:text-left w-full z-10 relative">
           <span className="text-[11px] font-extrabold tracking-[0.15em] text-indigo-600 uppercase mb-1.5 sm:mb-2">
             {heroTag}
           </span>
           
-          <h1 className="text-2xl sm:text-4xl lg:text-[42px] font-black text-slate-900 leading-[1.15] tracking-tight mb-2 sm:mb-3">
+          <h1 className="text-2xl sm:text-4xl xl:text-[42px] font-black text-slate-900 leading-[1.15] tracking-tight mb-2 sm:mb-3">
             Make creator <br />
             work <span className="text-indigo-600">work.</span>
           </h1>
           
-          <p className="text-slate-400 text-xs lg:text-[13px] font-normal max-w-sm">
+          <p className="text-slate-400 text-xs xl:text-[13px] font-normal max-w-sm">
             {heroSubtitle}
           </p>
         </div>
@@ -95,15 +95,15 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
       </div>
 
       {/* Bottom Section: Copyright (ซ่อนบนมือถือ แสดงเฉพาะบน Desktop) & Scroll Down Indicator */}
-      <div className="w-full z-10 flex flex-col items-center lg:items-start mt-2">
-        <div className="hidden lg:block text-[11px] text-slate-400 text-center lg:text-left w-full mb-1">
+      <div className="w-full z-10 flex flex-col items-center xl:items-start mt-2">
+        <div className="hidden xl:block text-[11px] text-slate-400 text-center xl:text-left w-full mb-1">
           {footerCopyright}
         </div>
 
         {/* Scroll Down Indicator */}
         <div 
           onClick={scrollToNext}
-          className="lg:hidden flex flex-col items-center text-center w-full cursor-pointer group pb-1"
+          className="xl:hidden flex flex-col items-center text-center w-full cursor-pointer group pb-1"
         >
           <div className="flex flex-col items-center animate-bounce animate-float delay-4">
             <span className="text-[10px] font-extrabold text-slate-400 tracking-[0.2em] uppercase group-hover:text-slate-600 transition">Scroll down</span>
