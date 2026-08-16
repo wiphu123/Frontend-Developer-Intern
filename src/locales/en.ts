@@ -143,6 +143,7 @@ export const en = {
     invalidEmail: 'Enter a valid email address',
     reqPassword: 'Password is required',
     successMsg: 'Login Successful!',
+    invalidCredentials: "Invalid email or password",
   },
  register: {
     title: 'Staff Registration',
@@ -178,5 +179,18 @@ export const en = {
     passwordMismatch: 'Passwords do not match',
     successMsg: 'Registration Successful!',
   },
-  
+  registerSuccess: {
+    title: "Staff Registration",
+    header: "Registration Submitted",
+    message: "Your account has been created and is awaiting approval from the administrator.",
+    loginBtn: "Go to Login Page",
+  },
+  kolRegisterSuccess: {
+    title: "KOL Registration",
+    header: "Registration Submitted",
+    message: "Please check your email and click the confirmation link. Our team will then verify your profile before you can log in.",
+    loginBtn: "Go to Login Page",
+    resendLink: "Resend",
+    resendAlert: "Verification email has been resent."
+  },
 };

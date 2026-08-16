@@ -21,7 +21,7 @@ export default function RegisterPage() {
   const [validations, setValidations] = useState<Record<string, boolean>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
- const validateField = (name: string, value: string, currentFormData = formData) => {
+  const validateField = (name: string, value: string, currentFormData = formData) => {
     let isValid = false;
     let errorMsg = '';
 
@@ -62,7 +62,6 @@ export default function RegisterPage() {
           isValid = false;
         } else {
           isValid = value === currentFormData.password;
-          // ดึงค่ามาจากตารางภาษาโดยตรงตรงนี้ครับ
           if (!isValid) errorMsg = t.register.passwordMismatch;
         }
         break;
@@ -88,7 +87,6 @@ export default function RegisterPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // บันทึกว่าช่องนี้เคยถูกใช้งาน/พิมพ์แล้วทันที
     setTouched((prev) => ({ ...prev, [name]: true }));
 
     const updatedFormData = { ...formData, [name]: value };
@@ -96,7 +94,6 @@ export default function RegisterPage() {
     
     validateField(name, value, updatedFormData);
 
-    // ถ้าเปลี่ยนรหัสผ่าน ให้สั่งเช็คช่องยืนยันรหัสผ่านแบบเรียลไทล์ทันทีด้วย
     if (name === 'password') {
       setTouched((prev) => ({ ...prev, confirmPassword: true }));
       validateField('confirmPassword', updatedFormData.confirmPassword, updatedFormData);
@@ -139,7 +136,25 @@ export default function RegisterPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateAll()) {
-      alert(t.register.successMsg);
+      // 1. ดึงข้อมูลผู้ใช้เก่าที่มีอยู่ออกมาจาก localStorage (ถ้าไม่มีให้เป็นอาเรย์ว่าง [])
+      const existingUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+
+      // 2. สร้างโครงสร้างข้อมูลใหม่ที่เก็บเฉพาะอีเมลและรหัสผ่าน
+      const newUser = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      // 3. นำข้อมูลใหม่เพิ่มต่อท้ายเข้าไปในอาเรย์
+      existingUsers.push(newUser);
+
+      // 4. บันทึกข้อมูลทั้งหมดกลับลงไปใน localStorage
+      localStorage.setItem('allUsers', JSON.stringify(existingUsers));
+
+      console.log('All Users Saved:', existingUsers);
+
+      // 5. เปลี่ยนเส้นทางไปที่หน้า "ส่งการลงทะเบียนแล้ว"
+      navigate('/register-success');
     }
   };
 
@@ -270,9 +285,9 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
                   >
-                    {showPassword ? <Eye className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+                    {showPassword ? <Eye className="w-[18px] h-[18px]" /> : <EyeOff className="w-[18px] h-[18px]" />}
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-400 mt-1.5">{t.register.passwordHint}</p>
@@ -308,7 +323,7 @@ export default function RegisterPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-[14px] font-medium rounded-xl shadow-sm transition-colors duration-200 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3 px-4 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-[14px] font-medium rounded-xl shadow-sm transition-colors duration-200 flex items-center justify-center gap-2 mt-4 cursor-pointer"
               >
                 <span>{t.register.submitBtn}</span>
                 <ArrowRight className="w-4 h-4" />

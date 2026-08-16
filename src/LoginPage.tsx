@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -14,6 +14,9 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [validations, setValidations] = useState<Record<string, boolean>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  
+  // สถานะสำหรับเก็บข้อความแจ้งเตือนเมื่ออีเมลหรือรหัสผ่านไม่ถูกต้อง
+  const [loginError, setLoginError] = useState('');
 
   const validateField = (name: string, value: string) => {
     let isValid = false;
@@ -62,6 +65,9 @@ export default function LoginPage() {
     setTouched((prev) => ({ ...prev, [name]: true }));
     setFormData((prev) => ({ ...prev, [name]: value }));
     validateField(name, value);
+
+    // เมื่อผู้ใช้พิมพ์แก้ไข ให้ซ่อนกล่องเตือน Login Error ทันที
+    if (loginError) setLoginError('');
   };
 
   const validateAll = () => {
@@ -83,7 +89,22 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateAll()) {
-      alert(t.login.successMsg);
+      // 1. ดึงข้อมูลรายชื่อผู้ใช้จาก localStorage
+      const existingUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+
+      // 2. ตรวจสอบว่ามีอีเมลและรหัสผ่านตรงกับข้อมูลที่บันทึกไว้หรือไม่
+      const foundUser = existingUsers.find(
+        (user: any) => user.email === formData.email && user.password === formData.password
+      );
+
+      if (foundUser) {
+        setLoginError('');
+        alert(t.login.successMsg);
+        navigate('/'); // เปลี่ยนเส้นทางไปหน้าหลักหรือแดชบอร์ด
+      } else {
+        // 3. ถ้ารหัสหรืออีเมลไม่ถูกต้อง แสดงกล่องเตือนโดยดึงข้อความจากไฟล์ภาษา
+        setLoginError(t.login.invalidCredentials);
+      }
     }
   };
 
@@ -161,9 +182,9 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                   >
-                    {showPassword ? <Eye className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
                 </div>
                 {errors.password && <p className="text-xs text-rose-500 mt-1">{errors.password}</p>}
@@ -173,9 +194,19 @@ export default function LoginPage() {
                 <a href="#forgot" className="text-xs text-indigo-600 font-semibold hover:underline">{t.login.forgotPassword}</a>
               </div>
 
+              {/* กล่องแจ้งเตือน Error สีแดงเมื่อรหัสหรืออีเมลผิด */}
+              {loginError && (
+                <div className="bg-[#FDF2F2] border border-[#FAD2D2] rounded-xl p-3 flex items-center gap-2.5 text-[#DC2626]">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <p className="text-xs font-medium leading-relaxed">
+                    {loginError}
+                  </p>
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-200 transition duration-200 flex items-center justify-center gap-2 mt-4 cursor-pointer"
               >
                 <span>{t.login.submitBtn}</span>
                 <ArrowRight className="w-4 h-4" />
