@@ -26,14 +26,14 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
   };
 
   return (
-    <div className="w-full h-screen xl:h-full flex flex-col justify-between items-stretch p-6 sm:p-8 xl:pt-48 xl:p-16 bg-white relative overflow-y-auto xl:overflow-hidden">
+    <div className="w-full min-h-screen xl:h-full flex flex-col justify-between items-stretch p-6 sm:p-8 xl:px-16 xl:pb-1 xl:pt-48 bg-white relative overflow-y-auto xl:overflow-hidden">
       
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 bg-[radial-[#e0e7ff]_1px,transparent_1px] [background-size:20px_20px] opacity-40 pointer-events-none"></div>
 
       {/* หมอกฝั่งขวาบน */}
-      <div aria-hidden="true" className="hidden xl:block absolute -right-20 top-1/4 -translate-y-1/2 pointer-events-none z-0">
-        <div className="w-[500px] h-[500px] rounded-full bg-purple-300/40 blur-[120px]"></div>
+      <div aria-hidden="true" className="absolute -right-20 top-0 pointer-events-none z-0">
+        <div className="w-[400px] h-[400px] rounded-full bg-purple-300/40 blur-[100px]"></div>
       </div>
 
       {/* หมอกซ้ายล่าง */}
@@ -43,8 +43,7 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
       </div>
 
       {/* Content Box หลัก */}
-      <div className="my-auto flex flex-col z-10 w-full py-2 gap-6">
-        
+<div className="my-auto flex flex-col items-center xl:items-start z-10 w-full py-2 gap-16">        
         {/* 1. ส่วนรูปภาพ: จัดให้อยู่กึ่งกลางพอดีในพื้นที่สีฟ้า */}
         <div className="w-full flex justify-center">
           <div className="relative w-[200px] sm:w-[240px] xl:w-[300px]">
@@ -78,58 +77,41 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
           </div>
         </div>
 
-        {/* 2. ส่วนข้อความแบ่งเป็น 3 เงื่อนไขขนาดหน้าจอ */}
+        {/* 2. ส่วนข้อความแบ่งเป็นเงื่อนไขขนาดหน้าจอ */}
         <div className="flex flex-col items-center xl:items-start text-center xl:text-left w-full z-10 relative">
           <span className="text-[10px] xl:text-[11px] font-extrabold tracking-[0.15em] text-indigo-600 uppercase mb-1">
             {heroTag}
           </span>
           
-          <h1 className="text-xl sm:text-2xl xl:text-[42px] font-black text-slate-900 leading-[1.15] tracking-tight mb-1.5 sm:mb-2">
-            
-            {/* 1. น้อยกว่า 1024px (มือถือ) - ให้อยู่บรรทัดเดียวกัน */}
-            <span className="block lg:hidden whitespace-nowrap">
-              Make creator work <span className="text-indigo-600">work.</span>
-            </span>
-
-            {/* 2. เท่ากับ 1024px ถึง 1279px (iPad / แท็บเล็ต) - ให้อยู่บรรทัดเดียวกัน */}
-            <span className="hidden lg:block xl:hidden whitespace-nowrap">
-              Make creator work <span className="text-indigo-600">work.</span>
-            </span>
-
-            {/* 3. มากกว่าหรือเท่ากับ 1280px (คอมพิวเตอร์ / Desktop) - แยกสองบรรทัด */}
-            <span className="hidden xl:block">
-              Make creator work <br />
-              <span className="text-indigo-600">work.</span>
-            </span>
-
-          </h1>
+         <h1 className="text-xl sm:text-2xl xl:text-[42px] font-black text-slate-900 leading-[1.15] tracking-tight mb-1.5 sm:mb-2">
+  Make creator work <span className="xl:block text-indigo-600">work.</span>
+</h1>
           
-          <p className="text-slate-400 text-[11px] xl:text-[13px] font-normal whitespace-nowrap max-w-none">
-            {heroSubtitle}
-          </p>
+          <p className="text-slate-400 text-[11px] xl:text-[13px] font-normal whitespace-normal xl:whitespace-nowrap text-center xl:text-left w-full mt-3">
+  {heroSubtitle}
+</p>
         </div>
 
       </div>
 
       {/* Bottom Section: Copyright & Scroll Down Indicator */}
-      <div className="w-full z-10 flex flex-col items-center xl:items-start mt-auto pt-2">
-        <div className="hidden xl:block text-[11px] text-slate-400 text-center xl:text-left w-full mb-1">
+      <footer className="w-full z-10 flex flex-col items-center xl:items-start mt-auto">
+        <div className="hidden xl:block text-[11px] text-slate-400 text-center xl:text-left w-full mb-0">
           {footerCopyright}
         </div>
 
-        {/* Scroll Down Indicator */}
+        {/* Scroll Down Indicator - ขยายให้ใหญ่ขึ้น */}
         <div 
           onClick={scrollToNext}
-          className="xl:hidden flex flex-col items-center text-center w-full cursor-pointer group pb-2"
+          className="xl:hidden flex flex-col items-center text-center w-full cursor-pointer group pb-6"
         >
           <div className="flex flex-col items-center animate-bounce animate-float delay-4">
-            <span className="text-[9px] xl:text-[10px] font-extrabold text-slate-400 tracking-[0.2em] uppercase group-hover:text-slate-600 transition">Scroll down</span>
-            <span className="text-[11px] xl:text-xs font-black text-slate-900 mt-0.5 group-hover:text-slate-900 transition">Join</span>
-            <ChevronDown className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-slate-400 mt-0.5" />
+            <span className="text-[10px] font-extrabold text-slate-400 tracking-[0.2em] uppercase group-hover:text-slate-600 transition">Scroll down</span>
+            <span className="text-xs font-black text-slate-900 mt-0.5 group-hover:text-slate-900 transition">Join</span>
+            <ChevronDown className="w-4 h-4 text-slate-400 mt-0.5" />
           </div>
         </div>
-      </div>
-
+      </footer>
     </div>
   );
 }

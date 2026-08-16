@@ -1,9 +1,23 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import HeroSection from './HeroSection';
 
 export default function App() {
+  const { pathname } = useLocation();
+
+  // สั่งให้เลื่อนคอนเทนเนอร์หลักกลับไปที่ตำแหน่งบนสุด (Hero section) ทุกครั้งที่เปลี่ยน Route
+  useEffect(() => {
+    const mainContainer = document.querySelector('main');
+    if (mainContainer) {
+      mainContainer.scrollTo({
+        top: 0,
+        behavior: 'smooth' // เปลี่ยนเป็น 'instant' หากต้องการให้ดีดขึ้นไปทันทีแบบไม่มีอนิเมชันเลื่อน
+      });
+    }
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <LanguageProvider>
       {/* Container หลัก คุมระบบ Scroll Snap เฉพาะโหมดมือถือ (แนวตั้ง) */}

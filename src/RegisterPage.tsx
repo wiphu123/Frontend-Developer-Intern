@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const [validations, setValidations] = useState<Record<string, boolean>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const validateField = (name: string, value: string, currentFormData = formData) => {
+  const validateField = (name: string, value: string, currentFormData = formData, isTouched: boolean = true) => {
     let isValid = false;
     let errorMsg = '';
 
@@ -37,9 +37,20 @@ export default function RegisterPage() {
         if (!value.trim()) {
           errorMsg = t.register.reqEmail;
           isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          errorMsg = t.register.invalidEmail;
+          isValid = false;
         } else {
-          isValid = /\S+@\S+\.\S+/.test(value);
-          if (!isValid) errorMsg = t.register.invalidEmail;
+          // เช็คว่ามีอีเมลนี้อยู่ใน localStorage หรือยัง
+          const existingUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+          const isEmailTaken = existingUsers.some((user: any) => user.email.toLowerCase() === value.trim().toLowerCase());
+          
+          if (isEmailTaken) {
+            errorMsg = 'This email is already registered.';
+            isValid = false;
+          } else {
+            isValid = true;
+          }
         }
         break;
       case 'position':
@@ -70,7 +81,8 @@ export default function RegisterPage() {
 
     setValidations((prev) => ({ ...prev, [name]: isValid }));
     
-    if (touched[name]) {
+    // แสดง error ทันทีถ้าฟิลด์นี้ถูกใช้งานแล้ว (isTouched เป็น true)
+    if (isTouched) {
       if (!isValid) {
         setErrors((prev) => ({ ...prev, [name]: errorMsg }));
       } else {
@@ -86,16 +98,18 @@ export default function RegisterPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
+    // บังคับเซ็ตว่าฟิลด์นี้ถูกแตะ/พิมพ์แล้วทันทีตั้งแต่ตัวอักษรแรก
     setTouched((prev) => ({ ...prev, [name]: true }));
 
     const updatedFormData = { ...formData, [name]: value };
     setFormData(updatedFormData);
     
-    validateField(name, value, updatedFormData);
+    // ส่งค่า true ไปบอกฟังก์ชัน validate ว่าให้แสดง error ทันที
+    validateField(name, value, updatedFormData, true);
 
     if (name === 'password') {
       setTouched((prev) => ({ ...prev, confirmPassword: true }));
-      validateField('confirmPassword', updatedFormData.confirmPassword, updatedFormData);
+      validateField('confirmPassword', updatedFormData.confirmPassword, updatedFormData, true);
     }
   };
 
@@ -112,11 +126,19 @@ export default function RegisterPage() {
     const newErrors: Record<string, string> = {};
     if (!formData.firstName.trim()) newErrors.firstName = t.register.reqFirstName;
     if (!formData.lastName.trim()) newErrors.lastName = t.register.reqLastName;
+    
     if (!formData.email.trim()) {
       newErrors.email = t.register.reqEmail;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = t.register.invalidEmail;
+    } else {
+      const existingUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+      const isEmailTaken = existingUsers.some((user: any) => user.email.toLowerCase() === formData.email.trim().toLowerCase());
+      if (isEmailTaken) {
+        newErrors.email = 'This email is already registered.';
+      }
     }
+
     if (!formData.position) newErrors.position = t.register.reqPosition;
     if (!formData.password) {
       newErrors.password = t.register.reqPassword;
@@ -124,7 +146,7 @@ export default function RegisterPage() {
       newErrors.password = t.register.shortPassword;
     }
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = t.register.reqPassword;
+      newErrors.confirmPassword = t.register.passwordMismatch;
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = t.register.passwordMismatch;
     }
@@ -137,7 +159,10 @@ export default function RegisterPage() {
     if (validateAll()) {
       const existingUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
       const newUser = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
+        position: formData.position,
         password: formData.password,
       };
       existingUsers.push(newUser);
@@ -156,8 +181,7 @@ export default function RegisterPage() {
   };
 
   return (
-    /* ปรับคลาสหลักให้ใช้ w-full h-screen lg:h-full พร้อม snap-start และ overflow-y-auto เพื่อให้อยู่ตรงกลางฝั่งขวาและสลับหน้าได้สมบูรณ์แบบ */
-    <div className="w-full h-screen lg:h-full snap-start lg:snap-none flex flex-col justify-center items-center p-6 sm:p-10 lg:p-12 font-['Prompt'] relative bg-[#F4F2FF] overflow-y-auto">
+    <div className="w-full min-h-screen flex flex-col justify-center items-center p-6 sm:p-10 lg:p-12 py-12 font-['Prompt'] relative bg-[#F4F2FF] overflow-y-auto">
       
       <div className="w-full max-w-[460px] my-auto py-8">
         

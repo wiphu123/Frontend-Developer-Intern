@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, ArrowRight, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher'; // นำเข้าคอมโพเนนต์เปลี่ยนภาษา
 import { useLanguage } from './contexts/LanguageContext';
@@ -168,14 +168,14 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                 >
-                  {showPassword ? <Eye className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <Eye className="w-4 h-4" />
                 </button>
               </div>
               {errors.password && <p className="text-xs text-rose-500 mt-1">{errors.password}</p>}
             </div>
 
             <div className="text-left">
-              <a href="#forgot" className="text-xs text-indigo-600 font-semibold hover:underline">{t.login.forgotPassword}</a>
+              <span className="text-xs text-indigo-600 font-semibold cursor-pointer">{t.login.forgotPassword}</span>
             </div>
 
             {/* กล่องแจ้งเตือน Error สีแดงเมื่อรหัสหรืออีเมลผิด */}
@@ -223,11 +223,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6 pb-2">
-        <a href="#privacy" className="hover:text-slate-600">{t.common.privacy}</a>
-        <a href="#terms" className="hover:text-slate-600">{t.common.terms}</a>
-        <a href="#help" className="hover:text-slate-600">{t.common.help}</a>
-      </div>
+      {/* ลิงก์ Privacy, Terms, Help Center แบบไม่เปลี่ยนสีตอน Hover */}
+      <footer className="flex justify-center items-center gap-6 text-xs text-slate-400 mt-6 pb-2 select-none">
+        <span className="cursor-default hover:text-slate-400">{t.common.privacy}</span>
+        <span className="cursor-default hover:text-slate-400">{t.common.terms}</span>
+        <span className="cursor-default hover:text-slate-400">{t.common.help}</span>
+      </footer>
     </div>
   );
 }
