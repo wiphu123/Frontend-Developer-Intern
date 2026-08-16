@@ -26,7 +26,7 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
   };
 
   return (
-    <div className="w-full h-screen xl:h-full flex flex-col justify-between items-center xl:items-start p-6 sm:p-8 xl:pt-48 xl:p-16 bg-white relative overflow-y-auto xl:overflow-hidden">
+    <div className="w-full h-screen xl:h-full flex flex-col justify-between items-stretch p-6 sm:p-8 xl:pt-48 xl:p-16 bg-white relative overflow-y-auto xl:overflow-hidden">
       
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 bg-[radial-[#e0e7ff]_1px,transparent_1px] [background-size:20px_20px] opacity-40 pointer-events-none"></div>
@@ -43,55 +43,68 @@ export default function HeroSection({ heroTag, heroSubtitle, footerCopyright }: 
       </div>
 
       {/* Content Box หลัก */}
-      <div className="my-auto flex flex-col items-center xl:items-start text-center xl:text-left z-10 w-full max-w-sm xl:max-w-md mx-auto xl:mx-0 py-2">
+      <div className="my-auto flex flex-col z-10 w-full py-2 gap-6">
         
-        {/* Card Visual Hero Graphic */}
-        <div className="relative w-[200px] sm:w-[240px] xl:w-[300px] mx-auto xl:ml-[100px] mb-4 sm:mb-6">
-          
-          <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] xl:w-[450px] xl:h-[450px] bg-gradient-to-tr from-purple-300/45 via-indigo-200/40 to-fuchsia-200/30 blur-[80px] rounded-full pointer-events-none -z-10"></div>
-          
-          <div className="relative w-full h-[220px] sm:h-[260px] xl:h-[360px] bg-white rounded-[32px] p-1.5 shadow-2xl shadow-indigo-100/50 border border-slate-100/80 mx-auto">
-            <div className="w-full h-full rounded-[20px] overflow-hidden">
-              <img 
-                src={image} 
-                alt="Live Creator" 
-                className="w-full h-full object-cover" 
-              />
+        {/* 1. ส่วนรูปภาพ: จัดให้อยู่กึ่งกลางพอดีในพื้นที่สีฟ้า */}
+        <div className="w-full flex justify-center">
+          <div className="relative w-[200px] sm:w-[240px] xl:w-[300px]">
+            
+            <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] xl:w-[450px] xl:h-[450px] bg-gradient-to-tr from-purple-300/45 via-indigo-200/40 to-fuchsia-200/30 blur-[80px] rounded-full pointer-events-none -z-10"></div>
+            
+            <div className="relative w-full h-[220px] sm:h-[260px] xl:h-[360px] bg-white rounded-[32px] p-1.5 shadow-2xl shadow-indigo-100/50 border border-slate-100/80 mx-auto">
+              <div className="w-full h-full rounded-[20px] overflow-hidden">
+                <img 
+                  src={image} 
+                  alt="Live Creator" 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+
+              <div className="absolute top-8 sm:top-10 -right-6 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 border border-slate-100">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                <span className="text-[10px] xl:text-[11px] font-bold text-indigo-900">Live creator</span>
+              </div>
+
+              <div className="absolute -bottom-3 -right-9 bg-white px-3 py-1.5 xl:px-4 xl:py-2 rounded-2xl shadow-lg border border-slate-100 text-left transform -rotate-3 hover:rotate-0 transition duration-300">
+                <p className="text-sm xl:text-base font-black text-slate-900 leading-none">4.8M</p>
+                <p className="text-[7px] xl:text-[8px] font-extrabold text-slate-400 tracking-wider uppercase mt-0.5">TOTAL REACH</p>
+              </div>
             </div>
 
-            <div className="absolute top-8 sm:top-10 -right-6 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 border border-slate-100">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-              <span className="text-[10px] xl:text-[11px] font-bold text-indigo-900">Live creator</span>
-            </div>
-
-            <div className="absolute -bottom-3 -right-9 bg-white px-3 py-1.5 xl:px-4 xl:py-2 rounded-2xl shadow-lg border border-slate-100 text-left transform -rotate-3 hover:rotate-0 transition duration-300">
-              <p className="text-sm xl:text-base font-black text-slate-900 leading-none">4.8M</p>
-              <p className="text-[7px] xl:text-[8px] font-extrabold text-slate-400 tracking-wider uppercase mt-0.5">TOTAL REACH</p>
-            </div>
+            <div className="absolute -top-6 -right-4 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float">✨</div>
+            <div className="absolute top-14 -left-8 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float delay-1">😍</div>
+            <div className="absolute -bottom-2 -left-6 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float delay-2">🔥</div>
+            <div className="absolute bottom-12 -right-8 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float delay-3">💜</div>
           </div>
-
-          <div className="absolute -top-6 -right-4 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float">✨</div>
-          <div className="absolute top-14 -left-8 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float delay-1">😍</div>
-          <div className="absolute -bottom-2 -left-6 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float delay-2">🔥</div>
-          <div className="absolute bottom-12 -right-8 w-8 h-8 xl:w-11 xl:h-11 bg-white rounded-full shadow-sm flex items-center justify-center text-sm xl:text-xl border border-slate-50 animate-float delay-3">💜</div>
         </div>
 
-        {/* บล็อกข้อความ */}
+        {/* 2. ส่วนข้อความแบ่งเป็น 3 เงื่อนไขขนาดหน้าจอ */}
         <div className="flex flex-col items-center xl:items-start text-center xl:text-left w-full z-10 relative">
           <span className="text-[10px] xl:text-[11px] font-extrabold tracking-[0.15em] text-indigo-600 uppercase mb-1">
             {heroTag}
           </span>
           
-          {/* ใช้ whitespace-nowrap ครอบ work work. เพื่อไม่ให้คำถูกตัดแยกบรรทัด และให้ขึ้นบรรทัดใหม่หลัง creator เฉพาะจอมือถือเล็กๆ */}
           <h1 className="text-xl sm:text-2xl xl:text-[42px] font-black text-slate-900 leading-[1.15] tracking-tight mb-1.5 sm:mb-2">
-            Make creator <br className="block lg:hidden" />
-            <span className="whitespace-nowrap">
-              work <span className="text-indigo-600">work.</span>
+            
+            {/* 1. น้อยกว่า 1024px (มือถือ) - ให้อยู่บรรทัดเดียวกัน */}
+            <span className="block lg:hidden whitespace-nowrap">
+              Make creator work <span className="text-indigo-600">work.</span>
             </span>
+
+            {/* 2. เท่ากับ 1024px ถึง 1279px (iPad / แท็บเล็ต) - ให้อยู่บรรทัดเดียวกัน */}
+            <span className="hidden lg:block xl:hidden whitespace-nowrap">
+              Make creator work <span className="text-indigo-600">work.</span>
+            </span>
+
+            {/* 3. มากกว่าหรือเท่ากับ 1280px (คอมพิวเตอร์ / Desktop) - แยกสองบรรทัด */}
+            <span className="hidden xl:block">
+              Make creator work <br />
+              <span className="text-indigo-600">work.</span>
+            </span>
+
           </h1>
           
-          {/* เพิ่ม whitespace-nowrap เพื่อให้ข้อความอยู่บรรทัดเดียวกันทั้งหมด */}
-          <p className="text-slate-400 text-[11px] xl:text-[13px] font-normal whitespace-nowrap">
+          <p className="text-slate-400 text-[11px] xl:text-[13px] font-normal whitespace-nowrap max-w-none">
             {heroSubtitle}
           </p>
         </div>
