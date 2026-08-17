@@ -27,7 +27,7 @@ export const en = {
     reqFirstName: 'First name is required',
     reqLastName: 'Last name is required',
     reqPhone: 'Phone number is required',
-    invalidPhone: 'Invalid phone Enter a valid Thai phone number format',
+    invalidPhone: 'Enter a valid Thai phone number',
   },
   step2: {
     stepInfo: 'Step 2 of 6 · Work Preferences',
@@ -189,9 +189,9 @@ export const en = {
   kolRegisterSuccess: {
     title: "KOL Registration",
     header: "Registration Submitted",
-    message: "Please check your email and click the confirmation link. Our team will then verify your profile before you can log in.",
-    loginBtn: "Go to Login Page",
-    resendLink: "Resend",
+    message: "Check your email and click the confirmation link. Your profile is then reviewed by the marketing team before you can sign in.",
+    loginBtn: "Go to sign in",
+    resendLink: "Send a new link",
     resendAlert: "Verification email has been resent."
   },
 };
